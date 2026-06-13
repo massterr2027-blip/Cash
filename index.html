@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+  <title>Кошелек — Калькулятор расходов</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: #f2f4f8;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    /* мобильный контейнер */
+    .app-container {
+      max-width: 500px;
+      width: 100%;
+      margin: 0 auto;
+      background: white;
+      border-radius: 36px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+      overflow: hidden;
+      padding: 20px 18px 30px;
+      transition: all 0.2s;
+    }
+
+    /* баланс */
+    .balance-section {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border-radius: 28px;
+      padding: 22px 20px;
+      margin-bottom: 24px;
+      color: white;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+    .balance-label {
+      font-size: 15px;
+      font-weight: 500;
+      opacity: 0.8;
+      margin-bottom: 8px;
+    }
+    .balance-amount {
+      font-size: 44px;
+      font-weight: 800;
+      word-break: break-word;
+      margin-bottom: 18px;
+      letter-spacing: -0.5px;
+    }
+    .stats-row {
+      display: flex;
+      gap: 14px;
+    }
+    .stat-card {
+      flex: 1;
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 10px 12px;
+    }
+    .stat-title {
+      font-size: 13px;
+      opacity: 0.8;
+    }
+    .stat-number {
+      font-size: 20px;
+      font-weight: 700;
+      margin-top: 5px;
+    }
+    .income-text { color: #bef264; }
+    .expense-text { color: #fda4af; }
+
+    /* форма (динамическая подсветка через классы) */
+    .add-form {
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 18px 16px;
+      margin-bottom: 28px;
+      border: 2px solid #eef2ff;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    }
+    .add-form.income-glow {
+      border-color: #86efac;
+      background: #f0fdf4;
+      box-shadow: 0 4px 14px rgba(34,197,94,0.1);
+    }
+    .add-form.expense-glow {
+      border-color: #fecaca;
+      background: #fff5f5;
+      box-shadow: 0 4px 14px rgba(239,68,68,0.08);
+    }
+    .form-title {
+      font-weight: 600;
+      margin-bottom: 14px;
+      font-size: 18px;
+      color: #1e293b;
+    }
+    .form-row {
+      margin-bottom: 14px;
+    }
+    input, select {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 16px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 28px;
+      background: #fff;
+      font-family: inherit;
+      transition: 0.2s;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #3b82f6;
+    }
+    /* кнопки переключения типа */
+    .type-toggle {
+      display: flex;
+      gap: 12px;
+    }
+    .type-btn {
+      flex: 1;
+      text-align: center;
+      padding: 12px 0;
+      border-radius: 44px;
+      font-weight: 600;
+      background: #f1f5f9;
+      color: #334155;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 1px solid transparent;
+    }
+    .type-btn.active-income {
+      background: #22c55e;
+      color: white;
+      border-color: #15803d;
+    }
+    .type-btn.active-expense {
+      background: #ef4444;
+      color: white;
+      border-color: #b91c1c;
+    }
+    .add-button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      font-weight: 700;
+      font-size: 18px;
+      padding: 14px;
+      border-radius: 44px;
+      width: 100%;
+      cursor: pointer;
+      transition: 0.15s;
+      margin-top: 6px;
+    }
+    .add-button:active { transform: scale(0.97); background: #2563eb; }
+
+    /* управление категориями */
+    .category-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .category-row select {
+      flex: 1;
+    }
+    .edit-cat-btn {
+      background: #f1f5f9;
+      border: none;
+      font-size: 24px;
+      width: 48px;
+      height: 48px;
+      border-radius: 48px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* модальное окно для редактирования категорий */
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      visibility: hidden;
+      opacity: 0;
+      transition: 0.2s;
+    }
+    .modal.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    .modal-content {
+      background: white;
+      max-width: 340px;
+      width: 90%;
+      border-radius: 40px;
+      padding: 24px 20px;
+      box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+    }
+    .modal-content h4 {
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+    .cat-list {
+      max-height: 260px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+    .cat-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #edf2f7;
+    }
+    .cat-name {
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .cat-actions button {
+      background: none;
+      border: none;
+      font-size: 20px;
+      margin-left: 12px;
+      cursor: pointer;
+      padding: 6px;
+    }
+    .add-cat-field {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .add-cat-field input {
+      flex: 1;
+      padding: 12px;
+    }
+    .close-modal {
+      margin-top: 20px;
+      background: #eef2ff;
+      border: none;
+      padding: 12px;
+      border-radius: 40px;
+      width: 100%;
+      font-weight: 600;
+    }
+
+    /* история */
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin: 8px 0 14px 0;
+    }
+    .history-header h3 { font-size: 20px; color: #0f172a; }
+    .clear-btn { background: none; border: none; font-size: 14px; color: #64748b; padding: 8px; }
+    .transactions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .day-group { margin-top: 6px; }
+    .day-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #334155;
+      padding: 8px 0 6px;
+      border-bottom: 1px solid #eef2f6;
+      margin-bottom: 8px;
+    }
+    .transaction-item {
+      background: #ffffff;
+      border-radius: 22px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #edf2f7;
+    }
+    .tx-left { flex: 1; }
+    .tx-category {
+      font-weight: 600;
+      font-size: 16px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: baseline;
+    }
+    .tx-comment { font-size: 12px; color: #5b6e8c; margin-top: 4px; }
+    .tx-amount {
+      font-size: 18px;
+      font-weight: 700;
+      margin-right: 10px;
+      min-width: 85px;
+      text-align: right;
+    }
+    .income-amount { color: #16a34a; }
+    .expense-amount { color: #dc2626; }
+    .delete-btn {
+      background: transparent;
+      border: none;
+      font-size: 24px;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      color: #cbd5e1;
+    }
+    .delete-btn:active { color: #ef4444; }
+
+    /* панель настроек */
+    .settings-panel {
+      margin-top: 28px;
+      padding-top: 16px;
+      border-top: 1px solid #edf2f8;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .settings-btn, .import-label {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 12px 8px;
+      border-radius: 44px;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+      flex: 1;
+      cursor: pointer;
+    }
+    .file-input-hidden { display: none; }
+    .empty-history { text-align: center; padding: 40px; color: #94a3b8; }
+    @media (max-width: 480px) {
+      .app-container { padding: 16px; }
+      .balance-amount { font-size: 36px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-container" id="app">
+  <!-- баланс -->
+  <div class="balance-section">
+    <div class="balance-label">💰 Текущий баланс</div>
+    <div class="balance-amount" id="balanceTotal">0 ₴</div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-title">📈 Доходы (мес)</div><div class="stat-number income-text" id="monthIncome">0 ₴</div></div>
+      <div class="stat-card"><div class="stat-title">📉 Расходы (мес)</div><div class="stat-number expense-text" id="monthExpense">0 ₴</div></div>
+    </div>
+  </div>
+
+  <!-- форма добавления -->
+  <div class="add-form" id="addForm">
+    <div class="form-title">➕ Новая операция</div>
+    <div class="form-row">
+      <input type="number" id="amountInput" placeholder="Сумма" inputmode="decimal" step="any" style="font-size: 18px;">
+    </div>
+    <div class="form-row">
+      <div class="type-toggle" id="typeToggle">
+        <div class="type-btn active-income" data-type="income">💰 Доход</div>
+        <div class="type-btn" data-type="expense">💸 Расход</div>
+      </div>
+    </div>
+    <div class="form-row category-row">
+      <select id="categorySelect"></select>
+      <button type="button" class="edit-cat-btn" id="editCategoryBtn">✏️</button>
+    </div>
+    <div class="form-row">
+      <input type="text" id="commentInput" placeholder="Комментарий (необязательно)">
+    </div>
+    <div class="form-row">
+      <input type="date" id="dateInput">
+    </div>
+    <button class="add-button" id="addTransactionBtn">➕ Добавить операцию</button>
+  </div>
+
+  <!-- история -->
+  <div class="history-header">
+    <h3>📋 История</h3>
+    <button class="clear-btn" id="softClearBtn">🗑 Очистить всё</button>
+  </div>
+  <div id="historyList" class="transactions-list"></div>
+
+  <!-- панель экспорт/бэкап -->
+  <div class="settings-panel">
+    <button class="settings-btn" id="exportExcelBtn">📎 Excel (CSV)</button>
+    <button class="settings-btn" id="exportBackupBtn">💾 Бэкап JSON</button>
+    <label class="import-label" id="importLabel">📂 Восстановить
+      <input type="file" id="importFileInput" accept=".json" class="file-input-hidden">
+    </label>
+  </div>
+</div>
+
+<!-- модальное окно для управления категориями -->
+<div id="categoryModal" class="modal">
+  <div class="modal-content">
+    <h4>✏️ Управление категориями</h4>
+    <div id="categoryListContainer" class="cat-list"></div>
+    <div class="add-cat-field">
+      <input type="text" id="newCategoryName" placeholder="Новая категория">
+      <button id="addCategoryBtn" style="border-radius:40px; padding:0 18px;">➕ Добавить</button>
+    </div>
+    <button class="close-modal" id="closeModalBtn">Закрыть</button>
+  </div>
+</div>
+
+<script>
+  // ---------- ХРАНИЛИЩЕ ----------
+  const STORAGE_KEY = 'simple_expenses_pro';
+  let transactions = [];        // массив операций
+  let categories = ['Продукты', 'Транспорт', 'Бизнес', 'Жилье', 'Другое']; // стандартные + пользовательские
+
+  // ---------- ПОМОЩНИКИ ----------
+  function saveToLocal() {
+    const data = {
+      transactions: transactions,
+      categories: categories
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  function loadFromLocal() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    try {
+      const data = JSON.parse(raw);
+      if (data.transactions && Array.isArray(data.transactions)) transactions = data.transactions;
+      if (data.categories && Array.isArray(data.categories)) categories = data.categories;
+      else categories = [...new Set(['Продукты', 'Транспорт', 'Бизнес', 'Жилье', 'Другое'].concat(categories))];
+    } catch(e) {}
+  }
+
+  // обновление выпадающего списка категорий
+  function refreshCategorySelect() {
+    const select = document.getElementById('categorySelect');
+    if (!select) return;
+    const currentVal = select.value;
+    select.innerHTML = '';
+    categories.forEach(cat => {
+      const option = document.createElement('option');
+      option.value = cat;
+      option.textContent = cat;
+      select.appendChild(option);
+    });
+    if (categories.includes(currentVal)) select.value = currentVal;
+    else select.value = categories[0] || '';
+  }
+
+  // пересчет статистики
+  function computeStats() {
+    let balance = 0;
+    let monthIncome = 0;
+    let monthExpense = 0;
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    for (let tx of transactions) {
+      if (tx.type === 'income') balance += tx.amount;
+      else balance -= tx.amount;
+      const txDate = new Date(tx.date);
+      if (txDate.getFullYear() === currentYear && txDate.getMonth() === currentMonth) {
+        if (tx.type === 'income') monthIncome += tx.amount;
+        else monthExpense += tx.amount;
+      }
+    }
+    return { balance, monthIncome, monthExpense };
+  }
+
+  function formatUAH(num) { return Number(num).toLocaleString('ru-UA', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' ₴'; }
+
+  function updateUI() {
+    const { balance, monthIncome, monthExpense } = computeStats();
+    document.getElementById('balanceTotal').innerText = formatUAH(balance);
+    document.getElementById('monthIncome').innerText = formatUAH(monthIncome);
+    document.getElementById('monthExpense').innerText = formatUAH(monthExpense);
+    renderHistory();
+    saveToLocal();
+  }
+
+  // группировка по дням
+  function groupByDate(transactionsArray) {
+    const copy = [...transactionsArray];
+    copy.sort((a,b) => new Date(b.date) - new Date(a.date));
+    const groups = {};
+    for (let tx of copy) {
+      const dateKey = tx.date;
+      if (!groups[dateKey]) groups[dateKey] = [];
+      groups[dateKey].push(tx);
+    }
+    return groups;
+  }
+
+  function formatDateLabel(dateStr) {
+    const today = new Date().toISOString().slice(0,10);
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+    if (dateStr === today) return 'Сегодня';
+    if (dateStr === yesterday) return 'Вчера';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+  }
+
+  function renderHistory() {
+    const container = document.getElementById('historyList');
+    if (!transactions.length) {
+      container.innerHTML = '<div class="empty-history">📭 Нет операций. Добавьте первую запись</div>';
+      return;
+    }
+    const grouped = groupByDate(transactions);
+    let html = '';
+    for (let [dateStr, txs] of Object.entries(grouped)) {
+      html += `<div class="day-group"><div class="day-label">📅 ${formatDateLabel(dateStr)}</div>`;
+      for (let tx of txs) {
+        const sign = tx.type === 'income' ? '+' : '−';
+        const amountClass = tx.type === 'income' ? 'income-amount' : 'expense-amount';
+        html += `
+          <div class="transaction-item" data-id="${tx.id}">
+            <div class="tx-left">
+              <div class="tx-category"><span>${escapeHtml(tx.category)}</span> <span style="font-size:12px;">${tx.type === 'income' ? '⬆ Доход' : '⬇ Расход'}</span></div>
+              ${tx.comment ? `<div class="tx-comment">📝 ${escapeHtml(tx.comment)}</div>` : ''}
+              <div class="tx-comment" style="font-size:10px;">${tx.date}</div>
+            </div>
+            <div class="tx-amount ${amountClass}">${sign} ${formatUAH(tx.amount)}</div>
+            <button class="delete-btn" data-id="${tx.id}">✕</button>
+          </div>
+        `;
+      }
+      html += `</div>`;
+    }
+    container.innerHTML = html;
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = parseInt(btn.getAttribute('data-id'), 10);
+        transactions = transactions.filter(t => t.id !== id);
+        updateUI();
+      });
+    });
+  }
+
+  function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+  // добавление транзакции
+  function addTransaction() {
+    let amountRaw = document.getElementById('amountInput').value.trim();
+    if (!amountRaw || isNaN(parseFloat(amountRaw)) || parseFloat(amountRaw) <= 0) {
+      alert('Введите корректную сумму > 0');
+      return;
+    }
+    let amount = parseFloat(amountRaw);
+    const activeTypeBtn = document.querySelector('#typeToggle .type-btn.active-income, #typeToggle .type-btn.active-expense');
+    let type = 'income';
+    if (activeTypeBtn && activeTypeBtn.getAttribute('data-type') === 'expense') type = 'expense';
+    const category = document.getElementById('categorySelect').value;
+    let comment = document.getElementById('commentInput').value.trim();
+    let dateRaw = document.getElementById('dateInput').value;
+    if (!dateRaw) dateRaw = new Date().toISOString().slice(0,10);
+    const newId = Date.now() + Math.floor(Math.random() * 100000);
+    transactions.push({
+      id: newId,
+      amount: amount,
+      type: type,
+      category: category,
+      comment: comment || '',
+      date: dateRaw
+    });
+    document.getElementById('amountInput').value = '';
+    document.getElementById('commentInput').value = '';
+    document.getElementById('dateInput').value = new Date().toISOString().slice(0,10);
+    updateUI();
+  }
+
+  // --- Подсветка формы при выборе типа ---
+  function setupFormGlow() {
+    const formDiv = document.getElementById('addForm');
+    const incomeBtn = document.querySelector('[data-type="income"]');
+    const expenseBtn = document.querySelector('[data-type="expense"]');
+    function updateGlow() {
+      const active = document.querySelector('#typeToggle .type-btn.active-income, #typeToggle .type-btn.active-expense');
+      if (!active) return;
+      const t = active.getAttribute('data-type');
+      formDiv.classList.remove('income-glow', 'expense-glow');
+      if (t === 'income') formDiv.classList.add('income-glow');
+      else formDiv.classList.add('expense-glow');
+    }
+    incomeBtn.addEventListener('click', () => { setTimeout(updateGlow, 10); });
+    expenseBtn.addEventListener('click', () => { setTimeout(updateGlow, 10); });
+    updateGlow();
+  }
+
+  // --- Управление категориями (модалка) ---
+  function openCategoryModal() {
+    const modal = document.getElementById('categoryModal');
+    renderCategoryList();
+    modal.classList.add('active');
+  }
+  function closeModal() { document.getElementById('categoryModal').classList.remove('active'); }
+  function renderCategoryList() {
+    const container = document.getElementById('categoryListContainer');
+    container.innerHTML = '';
+    categories.forEach((cat, idx) => {
+      const div = document.createElement('div');
+      div.className = 'cat-item';
+      div.innerHTML = `
+        <span class="cat-name">${escapeHtml(cat)}</span>
+        <div class="cat-actions">
+          <button class="edit-cat-name" data-index="${idx}" data-cat="${escapeHtml(cat)}">✏️</button>
+          <button class="del-cat" data-index="${idx}">🗑</button>
+        </div>
+      `;
+      container.appendChild(div);
+    });
+    // редактирование категории
+    document.querySelectorAll('.edit-cat-name').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(btn.getAttribute('data-index'), 10);
+        const oldName = categories[idx];
+        const newName = prompt('Введите новое название категории:', oldName);
+        if (newName && newName.trim() !== '' && !categories.includes(newName.trim())) {
+          // обновить во всех транзакциях
+          const oldCat = categories[idx];
+          const newCat = newName.trim();
+          categories[idx] = newCat;
+          for (let tx of transactions) {
+            if (tx.category === oldCat) tx.category = newCat;
+          }
+          refreshCategorySelect();
+          updateUI();
+          renderCategoryList();
+        } else if (newName && categories.includes(newName.trim())) alert('Такая категория уже существует');
+      });
+    });
+    document.querySelectorAll('.del-cat').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(btn.getAttribute('data-index'), 10);
+        const toDelete = categories[idx];
+        if (categories.length <= 1) { alert('Нельзя удалить последнюю категорию'); return; }
+        if (confirm(`Удалить категорию "${toDelete}"? Транзакции с ней будут перенесены в "Другое".`)) {
+          categories.splice(idx, 1);
+          for (let tx of transactions) {
+            if (tx.category === toDelete) tx.category = 'Другое';
+          }
+          if (!categories.includes('Другое')) categories.push('Другое');
+          refreshCategorySelect();
+          updateUI();
+          renderCategoryList();
+        }
+      });
+    });
+  }
+
+  // Добавить новую категорию
+  function addNewCategory() {
+    const input = document.getElementById('newCategoryName');
+    const val = input.value.trim();
+    if (val === '') return;
+    if (categories.includes(val)) { alert('Категория уже есть'); return; }
+    categories.push(val);
+    refreshCategorySelect();
+    renderCategoryList();
+    input.value = '';
+    updateUI();
+  }
+
+  // --- Экспорт CSV ---
+  function exportCSV() {
+    if (!transactions.length) { alert('Нет данных'); return; }
+    const headers = ['Дата','Тип (Доход/Расход)','Категория','Сумма','Комментарий'];
+    const rows = transactions.map(tx => [tx.date, tx.type === 'income' ? 'Доход' : 'Расход', tx.category, tx.amount.toString().replace('.',','), tx.comment || '']);
+    const csv = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(';')).join('\n');
+    const blob = new Blob(["\uFEFF" + csv], {type: 'text/csv;charset=utf-8;'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `expenses_${new Date().toISOString().slice(0,19)}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  function exportBackup() {
+    const backup = { version: '2.0', exportDate: new Date().toISOString(), transactions, categories };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], {type: 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `backup_${new Date().toISOString().slice(0,19)}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  function importBackup(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const parsed = JSON.parse(e.target.result);
+        let newTxs = [], newCats = [];
+        if (parsed.transactions && Array.isArray(parsed.transactions)) newTxs = parsed.transactions;
+        else if (Array.isArray(parsed)) newTxs = parsed;
+        else throw new Error('invalid');
+        if (parsed.categories && Array.isArray(parsed.categories)) newCats = parsed.categories;
+        else newCats = [...categories];
+        if (newTxs.length) {
+          transactions = newTxs.map(tx => ({ ...tx, id: Date.now() + Math.random() }));
+          categories = newCats.length ? newCats : categories;
+          refreshCategorySelect();
+          updateUI();
+          alert(`Восстановлено ${transactions.length} операций.`);
+        } else throw new Error();
+      } catch(e) { alert('Ошибка: файл повреждён или неверный формат'); }
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  function clearAll() {
+    if (confirm('Удалить абсолютно все транзакции?')) {
+      transactions = [];
+      updateUI();
+    }
+  }
+
+  // инициализация
+  function init() {
+    loadFromLocal();
+    if (!categories.length) categories = ['Продукты','Транспорт','Бизнес','Жилье','Другое'];
+    refreshCategorySelect();
+    const today = new Date().toISOString().slice(0,10);
+    document.getElementById('dateInput').value = today;
+
+    // события
+    document.getElementById('addTransactionBtn').addEventListener('click', addTransaction);
+    document.getElementById('exportExcelBtn').addEventListener('click', exportCSV);
+    document.getElementById('exportBackupBtn').addEventListener('click', exportBackup);
+    document.getElementById('softClearBtn').addEventListener('click', clearAll);
+    document.getElementById('editCategoryBtn').addEventListener('click', openCategoryModal);
+    document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+    document.getElementById('addCategoryBtn').addEventListener('click', addNewCategory);
+    document.getElementById('importFileInput').addEventListener('change', (e) => {
+      if (e.target.files[0]) importBackup(e.target.files[0]);
+      e.target.value = '';
+    });
+    // переключение типа
+    const typeBtns = document.querySelectorAll('#typeToggle .type-btn');
+    typeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        typeBtns.forEach(b => b.classList.remove('active-income', 'active-expense'));
+        const t = btn.getAttribute('data-type');
+        if (t === 'income') btn.classList.add('active-income');
+        else btn.classList.add('active-expense');
+        setupFormGlow();
+      });
+    });
+    setupFormGlow();
+    updateUI();
+  }
+  init();
+</script>
+</body>
+</html>
