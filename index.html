@@ -14,7 +14,7 @@
     }
 
     body {
-      background: #eef2f8;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
       display: flex;
       justify-content: center;
@@ -29,7 +29,7 @@
       margin: 0 auto;
       background: white;
       border-radius: 36px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
       overflow: hidden;
       padding: 20px 18px 30px;
     }
@@ -66,7 +66,10 @@
       font-size: 20px;
       font-weight: 700;
       letter-spacing: 1px;
-      color: #e8c25d;
+      background: linear-gradient(135deg, #FFD700, #FFA500);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
     .card-actions {
       display: flex;
@@ -91,7 +94,7 @@
     .icon-btn svg {
       width: 22px;
       height: 22px;
-      stroke: white;
+      stroke: #FFD700;
       stroke-width: 1.8;
       fill: none;
     }
@@ -109,6 +112,10 @@
       font-size: 44px;
       font-weight: 800;
       letter-spacing: -1px;
+      background: linear-gradient(135deg, #fff, #FFD700);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
     .card-stats {
       display: flex;
@@ -132,9 +139,9 @@
     .card-stat-value.income { color: #4ade80; }
     .card-stat-value.expense { color: #f87171; }
     .card-button {
-      background: rgba(255,255,255,0.12);
+      background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,165,0,0.2));
       backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,215,0,0.4);
       padding: 12px;
       border-radius: 60px;
       text-align: center;
@@ -143,10 +150,11 @@
       cursor: pointer;
       transition: 0.1s;
       margin-bottom: 12px;
+      color: #FFD700;
     }
     .card-button:active {
       transform: scale(0.98);
-      background: rgba(255,255,255,0.2);
+      background: linear-gradient(135deg, rgba(255,215,0,0.3), rgba(255,165,0,0.3));
     }
     .card-bottom {
       display: flex;
@@ -157,6 +165,7 @@
       font-family: 'Courier New', monospace;
       font-size: 12px;
       text-align: right;
+      opacity: 0.7;
     }
     .card-expiry span {
       display: block;
@@ -165,7 +174,7 @@
       margin-bottom: 2px;
     }
 
-    /* Фильтры внутри истории */
+    /* Фильтры */
     .filter-bar {
       display: flex;
       gap: 10px;
@@ -181,9 +190,11 @@
       font-weight: 700;
       font-size: 14px;
       cursor: pointer;
+      color: #475569;
+      transition: 0.2s;
     }
     .filter-btn.active-filter {
-      background: #4f46e5;
+      background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
     }
 
@@ -209,7 +220,10 @@
     .day-label {
       font-size: 14px;
       font-weight: 800;
-      color: #475569;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
       padding: 8px 0;
     }
     .transaction-item {
@@ -221,6 +235,10 @@
       justify-content: space-between;
       align-items: center;
       border: 1px solid #e2e8f0;
+      transition: 0.2s;
+    }
+    .transaction-item:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     .tx-left { flex: 1; }
     .tx-category {
@@ -258,6 +276,11 @@
       cursor: pointer;
       font-size: 20px;
       color: #94a3b8;
+      transition: 0.2s;
+    }
+    .delete-btn:active {
+      background: #fee2e2;
+      color: #ef4444;
     }
 
     /* Модальное окно операции */
@@ -304,7 +327,10 @@
     .modal-header h3 {
       font-size: 22px;
       font-weight: 800;
-      color: #1e293b;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
     .close-modal-btn {
       background: rgba(0,0,0,0.05);
@@ -329,7 +355,7 @@
     }
     input:focus {
       outline: none;
-      border-color: #4f46e5;
+      border-color: #667eea;
     }
     .type-toggle {
       display: flex;
@@ -345,6 +371,7 @@
       background: #f1f5f9;
       color: #475569;
       cursor: pointer;
+      transition: 0.2s;
     }
     .type-btn.active-income {
       background: #22c55e;
@@ -369,7 +396,7 @@
       align-items: center;
     }
     .submit-btn {
-      background: #4f46e5;
+      background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
       border: none;
       font-weight: 800;
@@ -425,9 +452,10 @@
       border-radius: 60px;
       cursor: pointer;
       font-weight: 600;
+      transition: 0.2s;
     }
     .category-option.selected {
-      background: #4f46e5;
+      background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
     }
     .calendar-header {
@@ -449,26 +477,56 @@
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       text-align: center;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 700;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      color: #64748b;
     }
     .calendar-days {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 6px;
+      gap: 8px;
     }
     .cal-day {
       padding: 12px 0;
       text-align: center;
-      border-radius: 40px;
+      border-radius: 50px;
       cursor: pointer;
       background: #f8fafc;
-      font-weight: 600;
+      font-weight: 500;
+      font-size: 15px;
+      transition: 0.1s;
+      border: 2px solid transparent;
+    }
+    .cal-day.has-transactions {
+      font-weight: 800;
+    }
+    .cal-day.income-dominant {
+      border-color: #22c55e;
+      background: #f0fdf4;
+    }
+    .cal-day.expense-dominant {
+      border-color: #ef4444;
+      background: #fef2f2;
     }
     .cal-day.selected {
-      background: #4f46e5;
+      background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
+      border-color: #667eea;
+    }
+    .cal-day.today {
+      position: relative;
+    }
+    .cal-day.today::after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 6px;
+      height: 6px;
+      background: #667eea;
+      border-radius: 6px;
     }
     .close-cat-btn, .close-cal-btn, .close-history-btn, .close-settings-btn {
       background: #f1f5f9;
@@ -481,7 +539,7 @@
       margin-top: 16px;
     }
 
-    /* Модалка управления категориями — круглые кнопки */
+    /* Модалка категорий */
     .cat-modal {
       position: fixed;
       top: 0; left: 0;
@@ -536,22 +594,12 @@
       border: none;
       font-size: 22px;
       cursor: pointer;
-      transition: 0.1s;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .cat-actions button:active {
-      transform: scale(0.94);
-    }
-    .edit-cat {
-      background: #eef2ff;
-      color: #4f46e5;
-    }
-    .del-cat {
-      background: #fef2f2;
-      color: #ef4444;
-    }
+    .edit-cat { background: #eef2ff; color: #4f46e5; }
+    .del-cat { background: #fef2f2; color: #ef4444; }
     .add-cat-field {
       display: flex;
       gap: 12px;
@@ -568,18 +616,14 @@
       width: 56px;
       height: 56px;
       border-radius: 56px;
-      background: #4f46e5;
+      background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
       border: none;
       font-size: 32px;
-      font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-    .add-cat-field button:active {
-      transform: scale(0.94);
     }
     .close-cat-btn {
       background: #f1f5f9;
@@ -590,6 +634,64 @@
       font-weight: 700;
       cursor: pointer;
     }
+
+    /* Настройки баланса */
+    .balance-settings {
+      background: linear-gradient(135deg, #f8fafc, #eef2ff);
+      border-radius: 28px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .balance-settings h4 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #1e293b;
+    }
+    .balance-input-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .balance-input-row input {
+      flex: 1;
+      padding: 12px 16px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .apply-balance-btn {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 60px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .settings-panel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .settings-btn, .import-label {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 14px 10px;
+      border-radius: 60px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      flex: 1;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .settings-btn:hover, .import-label:hover {
+      background: #eef2ff;
+    }
+    .file-input-hidden { display: none; }
+    .empty-history { text-align: center; padding: 40px; color: #94a3b8; background: #f8fafc; border-radius: 28px; }
 
     /* Alert, Confirm, Prompt */
     .alert-modal, .confirm-modal, .prompt-modal {
@@ -628,28 +730,8 @@
     }
     .prompt-buttons { display: flex; gap: 12px; }
     .prompt-cancel, .prompt-ok { flex: 1; padding: 14px; border-radius: 60px; border: none; font-weight: 700; cursor: pointer; }
-    .prompt-ok { background: #4f46e5; color: white; }
+    .prompt-ok { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
     .prompt-cancel { background: #f1f5f9; }
-
-    .settings-panel {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 16px;
-    }
-    .settings-btn, .import-label {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      padding: 14px 10px;
-      border-radius: 60px;
-      font-size: 13px;
-      font-weight: 700;
-      text-align: center;
-      flex: 1;
-      cursor: pointer;
-    }
-    .file-input-hidden { display: none; }
-    .empty-history { text-align: center; padding: 40px; color: #94a3b8; background: #f8fafc; border-radius: 28px; }
   </style>
 </head>
 <body>
@@ -687,7 +769,7 @@
         <div class="card-stat-value expense" id="monthExpense">0 ₴</div>
       </div>
     </div>
-    <div class="card-button" id="openNewOperationBtn">Новая операция</div>
+    <div class="card-button" id="openNewOperationBtn">✨ Новая операция</div>
     <div class="card-bottom">
       <div class="card-expiry">
         <span>VALID THRU</span>
@@ -723,6 +805,14 @@
       <h3>⚙️ Управление данными</h3>
       <button class="close-modal-btn" id="closeSettingsBtn">✕</button>
     </div>
+    <!-- Настройка начального баланса -->
+    <div class="balance-settings">
+      <h4>💰 Начальный баланс</h4>
+      <div class="balance-input-row">
+        <input type="number" id="initialBalanceInput" placeholder="Сумма" step="any" value="0">
+        <button class="apply-balance-btn" id="applyBalanceBtn">Установить</button>
+      </div>
+    </div>
     <div class="settings-panel" style="flex-direction:column;">
       <button class="settings-btn" id="exportExcelBtn">📎 Excel (XLSX)</button>
       <button class="settings-btn" id="exportBackupBtn">💾 Бэкап JSON</button>
@@ -737,7 +827,7 @@
 <div id="operationModal" class="modal-overlay">
   <div class="add-form-modal" id="operationForm">
     <div class="modal-header">
-      <h3>Новая операция</h3>
+      <h3>✨ Новая операция</h3>
       <button class="close-modal-btn" id="closeModalBtn">✕</button>
     </div>
     <div class="form-row">
@@ -745,8 +835,8 @@
     </div>
     <div class="form-row">
       <div class="type-toggle" id="typeToggle">
-        <div class="type-btn active-income" data-type="income">Доход</div>
-        <div class="type-btn" data-type="expense">Расход</div>
+        <div class="type-btn active-income" data-type="income">💰 Доход</div>
+        <div class="type-btn" data-type="expense">💸 Расход</div>
       </div>
     </div>
     <div class="form-row">
@@ -764,14 +854,14 @@
         <span>📅</span>
       </button>
     </div>
-    <button class="submit-btn" id="addTransactionBtn">Добавить операцию</button>
+    <button class="submit-btn" id="addTransactionBtn">✅ Добавить операцию</button>
   </div>
 </div>
 
 <!-- Модалка выбора категории -->
 <div id="categorySelectModal" class="category-select-modal">
   <div class="category-select-content">
-    <h3>Выберите категорию</h3>
+    <h3>📂 Выберите категорию</h3>
     <div id="categorySelectList" class="category-list"></div>
     <button class="close-cat-btn" id="closeCategorySelectBtn">Закрыть</button>
   </div>
@@ -788,7 +878,7 @@
 <!-- Модалка категорий -->
 <div id="categoryModal" class="cat-modal">
   <div class="cat-content">
-    <h4>Редактирование категорий</h4>
+    <h4>✏️ Редактирование категорий</h4>
     <div id="categoryListContainer" class="cat-list"></div>
     <div class="add-cat-field">
       <input type="text" id="newCategoryName" placeholder="Новая категория">
@@ -799,9 +889,9 @@
 </div>
 
 <!-- Alert, Confirm, Prompt -->
-<div id="alertModal" class="alert-modal"><div class="alert-content"><h4 id="alertTitle">Уведомление</h4><p id="alertMessage"></p><button class="confirm-cancel" id="alertCloseBtn" style="background:#4f46e5;color:white;">OK</button></div></div>
-<div id="confirmModal" class="confirm-modal"><div class="confirm-content"><h4>Подтверждение</h4><p id="confirmMessage"></p><div class="confirm-buttons"><button class="confirm-cancel" id="confirmNoBtn">Отмена</button><button class="confirm-ok" id="confirmYesBtn">Удалить</button></div></div></div>
-<div id="promptModal" class="prompt-modal"><div class="prompt-content"><h3>Редактирование</h3><p>Введите новое название</p><input type="text" id="promptInput"><div class="prompt-buttons"><button class="prompt-cancel" id="promptCancelBtn">Отмена</button><button class="prompt-ok" id="promptOkBtn">Сохранить</button></div></div></div>
+<div id="alertModal" class="alert-modal"><div class="alert-content"><h4 id="alertTitle">📢 Уведомление</h4><p id="alertMessage"></p><button class="confirm-cancel" id="alertCloseBtn" style="background:linear-gradient(135deg, #667eea, #764ba2);color:white;">OK</button></div></div>
+<div id="confirmModal" class="confirm-modal"><div class="confirm-content"><h4>⚠️ Подтверждение</h4><p id="confirmMessage"></p><div class="confirm-buttons"><button class="confirm-cancel" id="confirmNoBtn">Отмена</button><button class="confirm-ok" id="confirmYesBtn">Удалить</button></div></div></div>
+<div id="promptModal" class="prompt-modal"><div class="prompt-content"><h3>✏️ Редактирование</h3><p>Введите новое название</p><input type="text" id="promptInput"><div class="prompt-buttons"><button class="prompt-cancel" id="promptCancelBtn">Отмена</button><button class="prompt-ok" id="promptOkBtn">Сохранить</button></div></div></div>
 
 <script>
   let transactions = [];
@@ -811,48 +901,81 @@
   let selectedCategory = 'Продукты';
   let currentCalendarYear = new Date().getFullYear();
   let currentCalendarMonth = new Date().getMonth();
+  let initialBalance = 0;  // Начальный баланс
 
-  function showAlert(msg, title = 'Уведомление') {
-    const modal = document.getElementById('alertModal');
-    document.getElementById('alertTitle').innerText = title;
-    document.getElementById('alertMessage').innerText = msg;
-    modal.classList.add('active');
-    document.getElementById('alertCloseBtn').onclick = () => modal.classList.remove('active');
+  function getDailyStats() {
+    const dailyStats = {};
+    for (let tx of transactions) {
+      const date = tx.date;
+      if (!dailyStats[date]) dailyStats[date] = { income: 0, expense: 0 };
+      if (tx.type === 'income') dailyStats[date].income += tx.amount;
+      else dailyStats[date].expense += tx.amount;
+    }
+    return dailyStats;
   }
 
-  function showConfirm(msg, onYes) {
-    const modal = document.getElementById('confirmModal');
-    document.getElementById('confirmMessage').innerText = msg;
-    modal.classList.add('active');
-    const yesBtn = document.getElementById('confirmYesBtn');
-    const noBtn = document.getElementById('confirmNoBtn');
-    const cleanup = () => { yesBtn.removeEventListener('click', onYesClick); noBtn.removeEventListener('click', onNoClick); };
-    const onYesClick = () => { modal.classList.remove('active'); cleanup(); if (onYes) onYes(); };
-    const onNoClick = () => { modal.classList.remove('active'); cleanup(); };
-    yesBtn.addEventListener('click', onYesClick);
-    noBtn.addEventListener('click', onNoClick);
+  function computeBalance() {
+    let balance = initialBalance;
+    for (let tx of transactions) {
+      if (tx.type === 'income') balance += tx.amount;
+      else balance -= tx.amount;
+    }
+    return balance;
   }
 
-  function showPrompt(currentVal, callback) {
-    const modal = document.getElementById('promptModal');
-    const input = document.getElementById('promptInput');
-    input.value = currentVal;
-    modal.classList.add('active');
-    input.focus();
-    const okBtn = document.getElementById('promptOkBtn');
-    const cancelBtn = document.getElementById('promptCancelBtn');
-    const onOk = () => { const newVal = input.value.trim(); modal.classList.remove('active'); cleanup(); if (newVal && newVal !== currentVal) callback(newVal); };
-    const onCancel = () => { modal.classList.remove('active'); cleanup(); };
-    const cleanup = () => { okBtn.removeEventListener('click', onOk); cancelBtn.removeEventListener('click', onCancel); };
-    okBtn.addEventListener('click', onOk);
-    cancelBtn.addEventListener('click', onCancel);
+  function computeStats() {
+    let monthIncome = 0, monthExpense = 0;
+    const now = new Date(), curYear = now.getFullYear(), curMonth = now.getMonth();
+    for (let tx of transactions) {
+      const d = new Date(tx.date);
+      if (d.getFullYear() === curYear && d.getMonth() === curMonth) {
+        if (tx.type === 'income') monthIncome += tx.amount;
+        else monthExpense += tx.amount;
+      }
+    }
+    return { monthIncome, monthExpense };
   }
 
-  function saveToLocal() { localStorage.setItem('expenses_app', JSON.stringify({ transactions, categories })); }
+  function saveToLocal() { 
+    localStorage.setItem('expenses_app', JSON.stringify({ transactions, categories, initialBalance })); 
+  }
+  
   function loadFromLocal() {
     const raw = localStorage.getItem('expenses_app');
-    if (raw) { try { const data = JSON.parse(raw); if (data.transactions) transactions = data.transactions; if (data.categories) categories = data.categories; } catch(e) {} }
+    if (raw) { 
+      try { 
+        const data = JSON.parse(raw); 
+        if (data.transactions) transactions = data.transactions; 
+        if (data.categories) categories = data.categories;
+        if (data.initialBalance !== undefined) initialBalance = data.initialBalance;
+      } catch(e) {} 
+    }
     if (!categories.length) categories = ['Продукты', 'Транспорт', 'Бизнес', 'Жилье', 'Другое'];
+    document.getElementById('initialBalanceInput').value = initialBalance;
+  }
+
+  function formatUAH(num) { 
+    return Number(num).toLocaleString('ru-UA', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' ₴'; 
+  }
+  
+  function updateStats() {
+    const balance = computeBalance();
+    const { monthIncome, monthExpense } = computeStats();
+    document.getElementById('balanceTotal').innerText = formatUAH(balance);
+    document.getElementById('monthIncome').innerText = formatUAH(monthIncome);
+    document.getElementById('monthExpense').innerText = formatUAH(monthExpense);
+  }
+
+  function setInitialBalance() {
+    const val = parseFloat(document.getElementById('initialBalanceInput').value);
+    if (!isNaN(val)) {
+      initialBalance = val;
+      saveToLocal();
+      updateStats();
+      showAlert(`Начальный баланс установлен на ${formatUAH(initialBalance)}`, '✅ Готово');
+    } else {
+      showAlert('Введите корректную сумму', 'Ошибка');
+    }
   }
 
   function filterByPeriod(period) {
@@ -863,26 +986,6 @@
     return [...transactions];
   }
 
-  function computeStats() {
-    let balance = 0, monthIncome = 0, monthExpense = 0;
-    const now = new Date(), curYear = now.getFullYear(), curMonth = now.getMonth();
-    for (let tx of transactions) {
-      if (tx.type === 'income') balance += tx.amount; else balance -= tx.amount;
-      const d = new Date(tx.date);
-      if (d.getFullYear() === curYear && d.getMonth() === curMonth) {
-        if (tx.type === 'income') monthIncome += tx.amount; else monthExpense += tx.amount;
-      }
-    }
-    return { balance, monthIncome, monthExpense };
-  }
-
-  function formatUAH(num) { return Number(num).toLocaleString('ru-UA', { min: 0, max: 2 }) + ' ₴'; }
-  function updateStats() {
-    const { balance, monthIncome, monthExpense } = computeStats();
-    document.getElementById('balanceTotal').innerText = formatUAH(balance);
-    document.getElementById('monthIncome').innerText = formatUAH(monthIncome);
-    document.getElementById('monthExpense').innerText = formatUAH(monthExpense);
-  }
   function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
   function formatDateLabel(d) {
     const today = new Date().toISOString().slice(0,10);
@@ -895,13 +998,13 @@
   function deleteTransaction(id) {
     transactions = transactions.filter(t => t.id.toString() !== id.toString());
     saveToLocal(); updateStats(); renderHistory();
-    showAlert('Запись удалена');
+    showAlert('Запись удалена', '✅ Готово');
   }
 
   function renderHistory() {
     const filtered = filterByPeriod(currentFilter);
     const container = document.getElementById('historyList');
-    if (!filtered.length) { container.innerHTML = '<div class="empty-history">Нет операций</div>'; return; }
+    if (!filtered.length) { container.innerHTML = '<div class="empty-history">📭 Нет операций</div>'; return; }
     const sorted = [...filtered].sort((a,b) => new Date(b.date) - new Date(a.date));
     const groups = {};
     for (let tx of sorted) { if (!groups[tx.date]) groups[tx.date] = []; groups[tx.date].push(tx); }
@@ -931,14 +1034,26 @@
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month+1, 0).getDate();
     const startOffset = firstDay === 0 ? 6 : firstDay - 1;
+    const dailyStats = getDailyStats();
+    const todayStr = new Date().toISOString().slice(0,10);
+    
     let html = `<div class="calendar-header"><button id="calPrevBtn">◀</button><span>${new Date(year, month).toLocaleDateString('ru', { month:'long', year:'numeric' })}</span><button id="calNextBtn">▶</button></div>`;
     html += `<div class="calendar-weekdays">${['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(d => `<div>${d}</div>`).join('')}</div><div class="calendar-days">`;
     for (let i=0; i<startOffset; i++) html += `<div></div>`;
     for (let d=1; d<=daysInMonth; d++) {
       const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
       const isSelected = dateStr === selectedDate;
-      const isToday = dateStr === new Date().toISOString().slice(0,10);
-      html += `<div class="cal-day ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}" data-date="${dateStr}">${d}</div>`;
+      const isToday = dateStr === todayStr;
+      const stats = dailyStats[dateStr];
+      const hasTransactions = stats && (stats.income > 0 || stats.expense > 0);
+      let additionalClass = '';
+      let dominantClass = '';
+      if (hasTransactions) {
+        additionalClass = 'has-transactions';
+        if (stats.income > stats.expense) dominantClass = 'income-dominant';
+        else if (stats.expense > stats.income) dominantClass = 'expense-dominant';
+      }
+      html += `<div class="cal-day ${isSelected ? 'selected' : ''} ${additionalClass} ${dominantClass} ${isToday ? 'today' : ''}" data-date="${dateStr}">${d}</div>`;
     }
     html += `</div>`;
     document.getElementById('calendarModalContent').innerHTML = html;
@@ -993,7 +1108,7 @@
     document.getElementById('selectedDateDisplay').innerText = selectedDate;
     saveToLocal(); updateStats(); renderHistory();
     document.getElementById('operationModal').classList.remove('active');
-    showAlert('Операция добавлена!', 'Готово');
+    showAlert('Операция добавлена!', '✅ Готово');
   }
 
   function renderCatList() {
@@ -1052,7 +1167,7 @@
     showAlert('Excel скачан');
   }
   function exportBackup() {
-    const blob = new Blob([JSON.stringify({ transactions, categories }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ transactions, categories, initialBalance }, null, 2)], { type: 'application/json' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_${new Date().toISOString().slice(0,19)}.json`; a.click();
     showAlert('Бэкап создан');
   }
@@ -1063,8 +1178,10 @@
         const data = JSON.parse(e.target.result);
         if (data.transactions) transactions = data.transactions.map(t => ({ ...t, id: Date.now() + Math.random() }));
         if (data.categories) categories = data.categories;
+        if (data.initialBalance !== undefined) initialBalance = data.initialBalance;
         if (!categories.includes(selectedCategory)) selectedCategory = categories[0];
         document.getElementById('selectedCategoryDisplay').innerText = selectedCategory;
+        document.getElementById('initialBalanceInput').value = initialBalance;
         saveToLocal(); updateStats(); renderHistory(); renderCategorySelectList();
         showAlert(`Восстановлено ${transactions.length} записей`);
       } catch { showAlert('Ошибка файла'); }
@@ -1086,6 +1203,42 @@
     else if (active?.dataset.type === 'expense') form.classList.add('expense-bg');
   }
 
+  function showAlert(msg, title = 'Уведомление') {
+    const modal = document.getElementById('alertModal');
+    document.getElementById('alertTitle').innerText = title;
+    document.getElementById('alertMessage').innerText = msg;
+    modal.classList.add('active');
+    document.getElementById('alertCloseBtn').onclick = () => modal.classList.remove('active');
+  }
+
+  function showConfirm(msg, onYes) {
+    const modal = document.getElementById('confirmModal');
+    document.getElementById('confirmMessage').innerText = msg;
+    modal.classList.add('active');
+    const yesBtn = document.getElementById('confirmYesBtn');
+    const noBtn = document.getElementById('confirmNoBtn');
+    const cleanup = () => { yesBtn.removeEventListener('click', onYesClick); noBtn.removeEventListener('click', onNoClick); };
+    const onYesClick = () => { modal.classList.remove('active'); cleanup(); if (onYes) onYes(); };
+    const onNoClick = () => { modal.classList.remove('active'); cleanup(); };
+    yesBtn.addEventListener('click', onYesClick);
+    noBtn.addEventListener('click', onNoClick);
+  }
+
+  function showPrompt(currentVal, callback) {
+    const modal = document.getElementById('promptModal');
+    const input = document.getElementById('promptInput');
+    input.value = currentVal;
+    modal.classList.add('active');
+    input.focus();
+    const okBtn = document.getElementById('promptOkBtn');
+    const cancelBtn = document.getElementById('promptCancelBtn');
+    const onOk = () => { const newVal = input.value.trim(); modal.classList.remove('active'); cleanup(); if (newVal && newVal !== currentVal) callback(newVal); };
+    const onCancel = () => { modal.classList.remove('active'); cleanup(); };
+    const cleanup = () => { okBtn.removeEventListener('click', onOk); cancelBtn.removeEventListener('click', onCancel); };
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+  }
+
   function init() {
     loadFromLocal();
     selectedCategory = categories[0];
@@ -1096,6 +1249,7 @@
     document.getElementById('openNewOperationBtn').onclick = () => document.getElementById('operationModal').classList.add('active');
     document.getElementById('openHistoryBtn').onclick = () => { renderHistory(); document.getElementById('historyModal').classList.add('active'); };
     document.getElementById('openSettingsBtn').onclick = () => document.getElementById('settingsDataModal').classList.add('active');
+    document.getElementById('applyBalanceBtn').onclick = setInitialBalance;
     
     document.getElementById('closeModalBtn').onclick = () => document.getElementById('operationModal').classList.remove('active');
     document.getElementById('closeHistoryBtn').onclick = () => document.getElementById('historyModal').classList.remove('active');
