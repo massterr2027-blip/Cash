@@ -34,6 +34,19 @@
       padding: 20px 18px 30px;
     }
 
+    /* Убираем стандартный скролл */
+    body::-webkit-scrollbar, .app-container::-webkit-scrollbar {
+      width: 5px;
+    }
+    body::-webkit-scrollbar-track, .app-container::-webkit-scrollbar-track {
+      background: #e2e8f0;
+      border-radius: 10px;
+    }
+    body::-webkit-scrollbar-thumb, .app-container::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 10px;
+    }
+
     /* Карта */
     .card-section {
       background: linear-gradient(145deg, #1a1a2e 0%, #0f0f23 100%);
@@ -261,6 +274,7 @@
       padding: 8px 0;
     }
     
+    /* Транзакции с полной цветной обводкой */
     .transaction-item {
       background: white;
       border-radius: 24px;
@@ -269,12 +283,12 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-left: 5px solid;
+      border: 2px solid;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       transition: 0.2s;
     }
-    .transaction-item.income-border { border-left-color: #22c55e; }
-    .transaction-item.expense-border { border-left-color: #ef4444; }
+    .transaction-item.income-border { border-color: #22c55e; }
+    .transaction-item.expense-border { border-color: #ef4444; }
     .transaction-item:hover {
       transform: translateX(4px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -501,7 +515,35 @@
       margin-top: 16px;
     }
 
-    /* Настройки - компактные */
+    /* Список категорий (круглые кнопки) */
+    .category-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin: 16px 0;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .category-option {
+      background: #f1f5f9;
+      padding: 10px 20px;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.2s;
+      color: #475569;
+    }
+    .category-option.selected {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+    .category-option:active {
+      transform: scale(0.95);
+    }
+
+    /* Настройки */
     .balance-settings {
       background: linear-gradient(135deg, #f8fafc, #eef2ff);
       border-radius: 24px;
@@ -510,7 +552,7 @@
     }
     .balance-settings h4 { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: #1e293b; }
     .balance-input-row { display: flex; gap: 10px; align-items: center; }
-    .balance-input-row input { flex: 1; padding: 10px 14px; font-size: 14px; font-weight: 600; border-radius: 60px; }
+    .balance-input-row input { flex: 1; padding: 10px 14px; font-size: 14px; font-weight: 600; border-radius: 60px; background: #f8fafc; border: 1px solid #e2e8f0; }
     .apply-balance-btn {
       background: linear-gradient(135deg, #22c55e, #16a34a);
       color: white;
@@ -540,18 +582,6 @@
       background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
     }
-    .clear-all-btn {
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-      color: white;
-      border: none;
-      padding: 12px 16px;
-      border-radius: 60px;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      width: 100%;
-      margin-bottom: 16px;
-    }
     .settings-panel { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
     .settings-btn, .import-label {
       background: #f8fafc;
@@ -566,6 +596,32 @@
     }
     .file-input-hidden { display: none; }
     .empty-history { text-align: center; padding: 30px; color: #94a3b8; background: #f8fafc; border-radius: 28px; font-size: 14px; }
+    
+    /* Кнопка очистки истории внизу настроек */
+    .danger-btn {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 60px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 16px;
+    }
+    .edit-categories-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 60px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 12px;
+    }
 
     /* Модалка категорий */
     .cat-modal {
@@ -698,10 +754,12 @@
   </div>
 </div>
 
-<!-- Модалка настроек - компактная -->
+<!-- Модалка настроек -->
 <div id="settingsDataModal" class="settings-data-modal">
   <div class="settings-data-content">
     <div class="modal-header"><h3>⚙️ Управление данными</h3><button class="close-modal-btn" id="closeSettingsBtn">✕</button></div>
+    
+    <!-- Начальный баланс -->
     <div class="balance-settings">
       <h4>💰 Начальный баланс</h4>
       <div class="balance-input-row">
@@ -709,6 +767,8 @@
         <button class="apply-balance-btn" id="applyBalanceBtn">Установить</button>
       </div>
     </div>
+    
+    <!-- Период статистики -->
     <div class="period-selector">
       <div class="period-title">📊 Период отображения статистики</div>
       <div class="period-buttons">
@@ -717,13 +777,20 @@
         <button class="period-btn" data-period="month">Месяц</button>
       </div>
     </div>
-    <button class="clear-all-btn" id="clearAllBtn">🗑 Очистить всю историю</button>
+    
+    <!-- Кнопка редактирования категорий -->
+    <button class="edit-categories-btn" id="editCategoriesBtn">✏️ Редактировать категории</button>
+    
+    <!-- Экспорт/импорт -->
     <div class="settings-panel">
       <button class="settings-btn" id="exportExcelBtn">📎 Excel</button>
       <button class="settings-btn" id="exportBackupBtn">💾 Бэкап</button>
       <label class="import-label">📂 Восстановить<input type="file" id="importFileInput" accept=".json" class="file-input-hidden"></label>
     </div>
-    <button class="settings-btn" id="editCategoriesBtn" style="margin-top:10px;">✏️ Редактировать категории</button>
+    
+    <!-- Кнопка очистки истории (внизу, перед закрытием) -->
+    <button class="danger-btn" id="clearAllBtn">🗑 Очистить всю историю</button>
+    
     <button class="close-settings-btn" id="closeSettingsModalBtn">Закрыть</button>
   </div>
 </div>
@@ -741,10 +808,33 @@
   </div>
 </div>
 
-<!-- Модалки выбора -->
-<div id="categorySelectModal" class="category-select-modal"><div class="category-select-content"><h3>📂 Выберите категорию</h3><div id="categorySelectList" class="category-list"></div><button class="close-cat-btn" id="closeCategorySelectBtn">Закрыть</button></div></div>
-<div id="dateSelectModal" class="calendar-view-modal"><div class="calendar-view-content"><div id="dateSelectCalendarContent"></div><button class="close-cal-btn" id="closeDateSelectCalendarBtn">Закрыть</button></div></div>
-<div id="categoryModal" class="cat-modal"><div class="cat-content"><h4>✏️ Редактирование категорий</h4><div id="categoryListContainer" class="cat-list"></div><div class="add-cat-field"><input type="text" id="newCategoryName" placeholder="Новая категория"><button id="addCategoryBtn">+</button></div><button class="close-cat-btn" id="closeCatModalBtn">Закрыть</button></div></div>
+<!-- Модалки выбора категории и даты -->
+<div id="categorySelectModal" class="category-select-modal">
+  <div class="category-select-content">
+    <h3>📂 Выберите категорию</h3>
+    <div id="categorySelectList" class="category-list"></div>
+    <button class="close-cat-btn" id="closeCategorySelectBtn">Закрыть</button>
+  </div>
+</div>
+<div id="dateSelectModal" class="calendar-view-modal">
+  <div class="calendar-view-content">
+    <div id="dateSelectCalendarContent"></div>
+    <button class="close-cal-btn" id="closeDateSelectCalendarBtn">Закрыть</button>
+  </div>
+</div>
+
+<!-- Модалка редактирования категорий -->
+<div id="categoryModal" class="cat-modal">
+  <div class="cat-content">
+    <h4>✏️ Редактирование категорий</h4>
+    <div id="categoryListContainer" class="cat-list"></div>
+    <div class="add-cat-field">
+      <input type="text" id="newCategoryName" placeholder="Новая категория">
+      <button id="addCategoryBtn">+</button>
+    </div>
+    <button class="close-cat-btn" id="closeCatModalBtn">Закрыть</button>
+  </div>
+</div>
 
 <!-- Alert, Confirm, Prompt -->
 <div id="alertModal" class="alert-modal"><div class="alert-content"><h4 id="alertTitle">📢 Уведомление</h4><p id="alertMessage"></p><button class="confirm-cancel" id="alertCloseBtn" style="background:linear-gradient(135deg, #667eea, #764ba2);color:white;">OK</button></div></div>
@@ -1077,7 +1167,31 @@
     };
     reader.readAsText(file);
   }
-  function clearAll() { showConfirm('Удалить ВСЕ операции?', () => { transactions = []; saveToLocal(); updateStats(); renderHistory(); showAlert('Все операции удалены'); }); }
+  
+  function setInitialBalanceWithConfirm() {
+    const newBalance = parseFloat(document.getElementById('initialBalanceInput').value);
+    if (isNaN(newBalance)) {
+      showAlert('Введите корректную сумму', 'Ошибка');
+      return;
+    }
+    showConfirm(`Установить начальный баланс на ${formatUAH(newBalance)}?`, () => {
+      initialBalance = newBalance;
+      saveToLocal();
+      updateStats();
+      showAlert(`Начальный баланс установлен на ${formatUAH(initialBalance)}`, '✅ Готово');
+    });
+  }
+  
+  function clearAllWithConfirm() {
+    showConfirm('Вы уверены, что хотите удалить ВСЕ операции? Это действие нельзя отменить.', () => {
+      transactions = [];
+      saveToLocal();
+      updateStats();
+      renderHistory();
+      showAlert('Все операции удалены', '✅ Готово');
+    });
+  }
+  
   function setFilter(f) { currentFilter = f; document.querySelectorAll('#historyModal .filter-btn:not(#openCalendarFromHistoryBtn)').forEach(btn => btn.classList.remove('active-filter')); document.querySelector(`#historyModal .filter-btn[data-filter="${f}"]`).classList.add('active-filter'); renderHistory(); }
   function setTypeFilter(f) { currentTypeFilter = f; document.querySelectorAll('#historyModal .type-filter-btn').forEach(btn => btn.classList.remove('active-type-filter')); document.querySelector(`#historyModal .type-filter-btn[data-type-filter="${f}"]`).classList.add('active-type-filter'); renderHistory(); }
   function updateFormBg() {
@@ -1133,12 +1247,8 @@
     document.getElementById('openNewOperationBtn').onclick = () => document.getElementById('operationModal').classList.add('active');
     document.getElementById('openHistoryBtn').onclick = () => { renderHistory(); document.getElementById('historyModal').classList.add('active'); };
     document.getElementById('openSettingsBtn').onclick = () => document.getElementById('settingsDataModal').classList.add('active');
-    document.getElementById('applyBalanceBtn').onclick = () => {
-      const val = parseFloat(document.getElementById('initialBalanceInput').value);
-      if (!isNaN(val)) { initialBalance = val; saveToLocal(); updateStats(); showAlert(`Начальный баланс: ${formatUAH(initialBalance)}`, '✅ Готово'); }
-      else showAlert('Введите корректную сумму', 'Ошибка');
-    };
-    document.getElementById('clearAllBtn').onclick = clearAll;
+    document.getElementById('applyBalanceBtn').onclick = setInitialBalanceWithConfirm;
+    document.getElementById('clearAllBtn').onclick = clearAllWithConfirm;
     document.getElementById('closeModalBtn').onclick = () => document.getElementById('operationModal').classList.remove('active');
     document.getElementById('closeHistoryBtn').onclick = () => document.getElementById('historyModal').classList.remove('active');
     document.getElementById('closeHistoryModalBtn').onclick = () => document.getElementById('historyModal').classList.remove('active');
