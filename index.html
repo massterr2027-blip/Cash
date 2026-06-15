@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-  <title>Кошелек — Калькулятор расходов</title>
+  <title>Кошелек — Калькулятор доходов и расходов</title>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
   <style>
     * {
@@ -62,8 +62,8 @@
       margin-bottom: 30px;
     }
     .bank-name {
-      font-family: 'Georgia', serif;
-      font-size: 20px;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
       font-weight: 700;
       letter-spacing: 1px;
       background: linear-gradient(135deg, #FFD700, #FFA500);
@@ -142,7 +142,7 @@
       background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,165,0,0.2));
       backdrop-filter: blur(8px);
       border: 1px solid rgba(255,215,0,0.4);
-      padding: 12px;
+      padding: 14px 20px;
       border-radius: 60px;
       text-align: center;
       font-weight: 700;
@@ -177,7 +177,7 @@
     /* Фильтры */
     .filter-bar {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       margin: 16px 0;
       flex-wrap: wrap;
     }
@@ -185,25 +185,58 @@
       flex: 1;
       background: #f1f5f9;
       border: none;
-      padding: 12px 0;
+      padding: 12px 8px;
       border-radius: 60px;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 13px;
       cursor: pointer;
       color: #475569;
       transition: 0.2s;
+      text-align: center;
+      white-space: nowrap;
     }
     .filter-btn.active-filter {
       background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
     }
+    .calendar-filter-btn {
+      background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+      color: #1e293b;
+    }
 
+    /* Фильтр по типу */
+    .type-filter-bar {
+      display: flex;
+      gap: 10px;
+      margin: 16px 0;
+      flex-wrap: wrap;
+    }
+    .type-filter-btn {
+      flex: 1;
+      background: #f1f5f9;
+      border: none;
+      padding: 10px 8px;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      color: #475569;
+      transition: 0.2s;
+      text-align: center;
+    }
+    .type-filter-btn.active-type-filter {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+
+    /* Кастомный скролл */
     .transactions-list {
       display: flex;
       flex-direction: column;
       gap: 12px;
-      max-height: 450px;
+      max-height: 400px;
       overflow-y: auto;
+      padding-right: 4px;
     }
     .transactions-list::-webkit-scrollbar {
       width: 5px;
@@ -213,9 +246,10 @@
       border-radius: 10px;
     }
     .transactions-list::-webkit-scrollbar-thumb {
-      background: #94a3b8;
+      background: linear-gradient(135deg, #667eea, #764ba2);
       border-radius: 10px;
     }
+
     .day-group { margin-top: 8px; }
     .day-label {
       font-size: 14px;
@@ -226,6 +260,7 @@
       color: transparent;
       padding: 8px 0;
     }
+    
     .transaction-item {
       background: white;
       border-radius: 24px;
@@ -234,37 +269,21 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border: 1px solid #e2e8f0;
+      border-left: 5px solid;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       transition: 0.2s;
     }
+    .transaction-item.income-border { border-left-color: #22c55e; }
+    .transaction-item.expense-border { border-left-color: #ef4444; }
     .transaction-item:hover {
+      transform: translateX(4px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     .tx-left { flex: 1; }
-    .tx-category {
-      font-weight: 800;
-      font-size: 16px;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 4px;
-    }
-    .tx-badge {
-      border-radius: 40px;
-      padding: 2px 10px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-    .tx-badge.income-badge { background: #22c55e; color: white; }
-    .tx-badge.expense-badge { background: #ef4444; color: white; }
+    .tx-category { font-weight: 800; font-size: 16px; color: #1e293b; margin-bottom: 4px; }
     .tx-comment { font-size: 12px; color: #64748b; margin-top: 4px; }
-    .tx-amount {
-      font-size: 18px;
-      font-weight: 800;
-      margin-right: 12px;
-      min-width: 90px;
-      text-align: right;
-    }
+    .tx-date { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+    .tx-amount { font-size: 18px; font-weight: 800; margin-right: 12px; min-width: 90px; text-align: right; }
     .income-amount { color: #16a34a; }
     .expense-amount { color: #dc2626; }
     .delete-btn {
@@ -283,7 +302,7 @@
       color: #ef4444;
     }
 
-    /* Модальное окно операции */
+    /* Модальные окна */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -306,7 +325,7 @@
     .add-form-modal {
       background: white;
       border-radius: 44px;
-      padding: 28px 24px;
+      padding: 24px 20px;
       width: 90%;
       max-width: 400px;
     }
@@ -322,10 +341,10 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     .modal-header h3 {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
       background: linear-gradient(135deg, #667eea, #764ba2);
       -webkit-background-clip: text;
@@ -335,56 +354,41 @@
     .close-modal-btn {
       background: rgba(0,0,0,0.05);
       border: none;
-      width: 44px;
-      height: 44px;
-      border-radius: 44px;
-      font-size: 24px;
+      width: 40px;
+      height: 40px;
+      border-radius: 40px;
+      font-size: 22px;
       cursor: pointer;
     }
-    .form-row {
-      margin-bottom: 16px;
-    }
+    .form-row { margin-bottom: 14px; }
     input {
       width: 100%;
-      padding: 16px 18px;
-      font-size: 16px;
+      padding: 14px 16px;
+      font-size: 15px;
       font-weight: 500;
       border: 1.5px solid #e2e8f0;
       border-radius: 60px;
       background: white;
     }
-    input:focus {
-      outline: none;
-      border-color: #667eea;
-    }
-    .type-toggle {
-      display: flex;
-      gap: 12px;
-    }
+    input:focus { outline: none; border-color: #667eea; }
+    .type-toggle { display: flex; gap: 12px; }
     .type-btn {
       flex: 1;
       text-align: center;
-      padding: 14px 0;
+      padding: 12px 0;
       border-radius: 60px;
       font-weight: 700;
-      font-size: 16px;
+      font-size: 15px;
       background: #f1f5f9;
       color: #475569;
       cursor: pointer;
-      transition: 0.2s;
     }
-    .type-btn.active-income {
-      background: #22c55e;
-      color: white;
-    }
-    .type-btn.active-expense {
-      background: #ef4444;
-      color: white;
-    }
+    .type-btn.active-income { background: #22c55e; color: white; }
+    .type-btn.active-expense { background: #ef4444; color: white; }
     .select-category-btn {
       width: 100%;
-      padding: 16px 18px;
-      font-size: 16px;
+      padding: 14px 16px;
+      font-size: 15px;
       font-weight: 600;
       background: white;
       border: 1.5px solid #e2e8f0;
@@ -400,16 +404,16 @@
       color: white;
       border: none;
       font-weight: 800;
-      font-size: 17px;
-      padding: 16px;
+      font-size: 16px;
+      padding: 14px;
       border-radius: 60px;
       width: 100%;
       cursor: pointer;
       margin-top: 8px;
     }
 
-    /* Модалки выбора */
-    .category-select-modal, .calendar-select-modal, .history-modal, .settings-data-modal {
+    /* Модалки */
+    .category-select-modal, .calendar-view-modal, .history-modal, .settings-data-modal {
       position: fixed;
       top: 0;
       left: 0;
@@ -424,120 +428,144 @@
       opacity: 0;
       transition: 0.2s;
     }
-    .category-select-modal.active, .calendar-select-modal.active, .history-modal.active, .settings-data-modal.active {
+    .category-select-modal.active, .calendar-view-modal.active, .history-modal.active, .settings-data-modal.active {
       visibility: visible;
       opacity: 1;
     }
-    .category-select-content, .calendar-select-content, .history-content, .settings-data-content {
+    .category-select-content, .calendar-view-content, .history-content, .settings-data-content {
       background: white;
       border-radius: 44px;
-      padding: 28px 24px;
+      padding: 20px 18px;
       width: 90%;
-      max-width: 420px;
+      max-width: 400px;
       text-align: center;
-    }
-    .history-content {
-      max-height: 80vh;
+      max-height: 85vh;
       overflow-y: auto;
     }
-    .category-list {
-      max-height: 350px;
-      overflow-y: auto;
-      margin: 20px 0;
-    }
-    .category-option {
-      padding: 16px;
-      margin: 6px 0;
-      background: #f8fafc;
-      border-radius: 60px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: 0.2s;
-    }
-    .category-option.selected {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-    }
-    .calendar-header {
+    .history-content { max-height: 80vh; }
+    .calendar-view-content .calendar-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
-    .calendar-header button {
+    .calendar-view-content .calendar-header button {
       background: #f1f5f9;
       border: none;
-      width: 44px;
-      height: 44px;
-      border-radius: 44px;
-      font-size: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 40px;
+      font-size: 18px;
       cursor: pointer;
     }
-    .calendar-weekdays {
+    .calendar-view-content .calendar-weekdays {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       text-align: center;
-      font-size: 13px;
+      font-size: 11px;
       font-weight: 700;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       color: #64748b;
     }
-    .calendar-days {
+    .calendar-view-content .calendar-days {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 8px;
+      gap: 6px;
     }
     .cal-day {
-      padding: 12px 0;
+      padding: 10px 0;
       text-align: center;
-      border-radius: 50px;
+      border-radius: 40px;
       cursor: pointer;
       background: #f8fafc;
       font-weight: 500;
-      font-size: 15px;
+      font-size: 14px;
       transition: 0.1s;
       border: 2px solid transparent;
     }
-    .cal-day.has-transactions {
-      font-weight: 800;
-    }
-    .cal-day.income-dominant {
-      border-color: #22c55e;
-      background: #f0fdf4;
-    }
-    .cal-day.expense-dominant {
-      border-color: #ef4444;
-      background: #fef2f2;
-    }
-    .cal-day.selected {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-      border-color: #667eea;
-    }
-    .cal-day.today {
-      position: relative;
-    }
-    .cal-day.today::after {
-      content: '';
-      position: absolute;
-      bottom: 4px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 6px;
-      height: 6px;
-      background: #667eea;
-      border-radius: 6px;
-    }
+    .cal-day.has-transactions { font-weight: 800; }
+    .cal-day.income-dominant { border-color: #22c55e; background: #f0fdf4; }
+    .cal-day.expense-dominant { border-color: #ef4444; background: #fef2f2; }
+    .cal-day.selected { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-color: #667eea; }
+    .cal-day.today { position: relative; }
+    .cal-day.today::after { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 6px; height: 6px; background: #667eea; border-radius: 6px; }
     .close-cat-btn, .close-cal-btn, .close-history-btn, .close-settings-btn {
       background: #f1f5f9;
       border: none;
-      padding: 14px;
+      padding: 12px;
       border-radius: 60px;
       width: 100%;
       font-weight: 700;
+      font-size: 14px;
       cursor: pointer;
       margin-top: 16px;
     }
+
+    /* Настройки - компактные */
+    .balance-settings {
+      background: linear-gradient(135deg, #f8fafc, #eef2ff);
+      border-radius: 24px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+    .balance-settings h4 { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: #1e293b; }
+    .balance-input-row { display: flex; gap: 10px; align-items: center; }
+    .balance-input-row input { flex: 1; padding: 10px 14px; font-size: 14px; font-weight: 600; border-radius: 60px; }
+    .apply-balance-btn {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 60px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .period-selector { margin-bottom: 16px; }
+    .period-title { font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 10px; text-align: left; }
+    .period-buttons { display: flex; gap: 10px; }
+    .period-btn {
+      flex: 1;
+      background: #f1f5f9;
+      border: none;
+      padding: 10px;
+      border-radius: 60px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      color: #475569;
+      transition: 0.2s;
+    }
+    .period-btn.active-period {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+    .clear-all-btn {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 60px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 16px;
+    }
+    .settings-panel { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .settings-btn, .import-label {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 12px 8px;
+      border-radius: 60px;
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+      flex: 1;
+      cursor: pointer;
+    }
+    .file-input-hidden { display: none; }
+    .empty-history { text-align: center; padding: 30px; color: #94a3b8; background: #f8fafc; border-radius: 28px; font-size: 14px; }
 
     /* Модалка категорий */
     .cat-modal {
@@ -552,146 +580,36 @@
       visibility: hidden;
       opacity: 0;
     }
-    .cat-modal.active {
-      visibility: visible;
-      opacity: 1;
-    }
+    .cat-modal.active { visibility: visible; opacity: 1; }
     .cat-content {
       background: white;
       width: 90%;
-      max-width: 360px;
-      border-radius: 48px;
-      padding: 28px 24px;
+      max-width: 350px;
+      border-radius: 44px;
+      padding: 20px 18px;
       text-align: center;
-    }
-    .cat-list {
-      max-height: 300px;
+      max-height: 85vh;
       overflow-y: auto;
-      margin: 20px 0;
     }
+    .cat-list { max-height: 280px; overflow-y: auto; margin: 16px 0; }
     .cat-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px 16px;
-      margin-bottom: 10px;
+      padding: 10px 14px;
+      margin-bottom: 8px;
       background: #f8fafc;
       border-radius: 60px;
     }
-    .cat-name {
-      font-size: 16px;
-      font-weight: 600;
-      color: #1e293b;
-    }
-    .cat-actions {
-      display: flex;
-      gap: 10px;
-    }
-    .cat-actions button {
-      width: 48px;
-      height: 48px;
-      border-radius: 48px;
-      border: none;
-      font-size: 22px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    .cat-name { font-size: 14px; font-weight: 600; color: #1e293b; }
+    .cat-actions { display: flex; gap: 8px; }
+    .cat-actions button { width: 40px; height: 40px; border-radius: 40px; border: none; font-size: 18px; cursor: pointer; }
     .edit-cat { background: #eef2ff; color: #4f46e5; }
     .del-cat { background: #fef2f2; color: #ef4444; }
-    .add-cat-field {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    .add-cat-field input {
-      flex: 1;
-      padding: 14px 18px;
-      border-radius: 60px;
-      border: 1.5px solid #e2e8f0;
-      font-size: 16px;
-    }
-    .add-cat-field button {
-      width: 56px;
-      height: 56px;
-      border-radius: 56px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-      border: none;
-      font-size: 32px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .close-cat-btn {
-      background: #f1f5f9;
-      border: none;
-      padding: 14px;
-      border-radius: 60px;
-      width: 100%;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    /* Настройки баланса */
-    .balance-settings {
-      background: linear-gradient(135deg, #f8fafc, #eef2ff);
-      border-radius: 28px;
-      padding: 16px;
-      margin-bottom: 20px;
-    }
-    .balance-settings h4 {
-      font-size: 14px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      color: #1e293b;
-    }
-    .balance-input-row {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-    .balance-input-row input {
-      flex: 1;
-      padding: 12px 16px;
-      font-size: 16px;
-      font-weight: 600;
-    }
-    .apply-balance-btn {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 60px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .settings-panel {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 16px;
-    }
-    .settings-btn, .import-label {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      padding: 14px 10px;
-      border-radius: 60px;
-      font-size: 13px;
-      font-weight: 700;
-      text-align: center;
-      flex: 1;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .settings-btn:hover, .import-label:hover {
-      background: #eef2ff;
-    }
-    .file-input-hidden { display: none; }
-    .empty-history { text-align: center; padding: 40px; color: #94a3b8; background: #f8fafc; border-radius: 28px; }
+    .add-cat-field { display: flex; gap: 10px; margin-bottom: 16px; }
+    .add-cat-field input { flex: 1; padding: 12px 14px; border-radius: 60px; border: 1.5px solid #e2e8f0; font-size: 14px; }
+    .add-cat-field button { width: 48px; height: 48px; border-radius: 48px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; font-size: 28px; cursor: pointer; }
+    .close-cat-btn { background: #f1f5f9; border: none; padding: 12px; border-radius: 60px; width: 100%; font-weight: 700; cursor: pointer; }
 
     /* Alert, Confirm, Prompt */
     .alert-modal, .confirm-modal, .prompt-modal {
@@ -706,106 +624,84 @@
       visibility: hidden;
       opacity: 0;
     }
-    .alert-modal.active, .confirm-modal.active, .prompt-modal.active {
-      visibility: visible;
-      opacity: 1;
-    }
+    .alert-modal.active, .confirm-modal.active, .prompt-modal.active { visibility: visible; opacity: 1; }
     .alert-content, .confirm-content, .prompt-content {
       background: white;
       width: 90%;
-      max-width: 340px;
-      border-radius: 48px;
-      padding: 32px 24px;
+      max-width: 320px;
+      border-radius: 44px;
+      padding: 24px 20px;
       text-align: center;
     }
     .confirm-buttons { display: flex; gap: 12px; margin-top: 8px; }
-    .confirm-cancel { background: #f1f5f9; flex: 1; padding: 14px; border-radius: 60px; border: none; font-weight: 700; cursor: pointer; }
-    .confirm-ok { background: #ef4444; color: white; flex: 1; padding: 14px; border-radius: 60px; border: none; font-weight: 700; cursor: pointer; }
-    .prompt-content input {
-      width: 100%;
-      padding: 14px;
-      border-radius: 60px;
-      margin-bottom: 20px;
-      border: 1.5px solid #e2e8f0;
-    }
+    .confirm-cancel { background: #f1f5f9; flex: 1; padding: 12px; border-radius: 60px; border: none; font-weight: 700; cursor: pointer; }
+    .confirm-ok { background: #ef4444; color: white; flex: 1; padding: 12px; border-radius: 60px; border: none; font-weight: 700; cursor: pointer; }
+    .prompt-content input { width: 100%; padding: 12px; border-radius: 60px; margin-bottom: 16px; border: 1.5px solid #e2e8f0; }
     .prompt-buttons { display: flex; gap: 12px; }
-    .prompt-cancel, .prompt-ok { flex: 1; padding: 14px; border-radius: 60px; border: none; font-weight: 700; cursor: pointer; }
+    .prompt-cancel, .prompt-ok { flex: 1; padding: 12px; border-radius: 60px; border: none; font-weight: 700; cursor: pointer; }
     .prompt-ok { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
     .prompt-cancel { background: #f1f5f9; }
   </style>
 </head>
 <body>
 <div class="app-container">
-  <!-- Карта -->
   <div class="card-section">
     <div class="card-top">
-      <div class="bank-name">TICKETSUSA</div>
+      <div class="bank-name">💰 КАЛЬКУЛЯТОР ДОХОДОВ</div>
       <div class="card-actions">
-        <div class="icon-btn" id="openHistoryBtn">
-          <svg viewBox="0 0 24 24" stroke="currentColor">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
-          </svg>
-        </div>
-        <div class="icon-btn" id="openSettingsBtn">
-          <svg viewBox="0 0 24 24" stroke="currentColor">
-            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z" />
-          </svg>
-        </div>
+        <div class="icon-btn" id="openHistoryBtn"><svg viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="icon-btn" id="openSettingsBtn"><svg viewBox="0 0 24 24" stroke="currentColor"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></div>
       </div>
     </div>
-    <div class="balance-area">
-      <div class="balance-label">ТЕКУЩИЙ БАЛАНС</div>
-      <div class="balance-amount" id="balanceTotal">0 ₴</div>
-    </div>
+    <div class="balance-area"><div class="balance-label">ТЕКУЩИЙ БАЛАНС</div><div class="balance-amount" id="balanceTotal">0 ₴</div></div>
     <div class="card-stats">
-      <div class="card-stat">
-        <div class="card-stat-label">ДОХОДЫ (МЕС)</div>
-        <div class="card-stat-value income" id="monthIncome">0 ₴</div>
-      </div>
-      <div class="card-stat">
-        <div class="card-stat-label">РАСХОДЫ (МЕС)</div>
-        <div class="card-stat-value expense" id="monthExpense">0 ₴</div>
-      </div>
+      <div class="card-stat"><div class="card-stat-label" id="statsLabelIncome">ДОХОДЫ (МЕСЯЦ)</div><div class="card-stat-value income" id="periodIncome">0 ₴</div></div>
+      <div class="card-stat"><div class="card-stat-label" id="statsLabelExpense">РАСХОДЫ (МЕСЯЦ)</div><div class="card-stat-value expense" id="periodExpense">0 ₴</div></div>
     </div>
     <div class="card-button" id="openNewOperationBtn">✨ Новая операция</div>
-    <div class="card-bottom">
-      <div class="card-expiry">
-        <span>VALID THRU</span>
-        <span id="cardExpiry">12/35</span>
-      </div>
-    </div>
+    <div class="card-bottom"><div class="card-expiry"><span>VALID THRU</span><span id="cardExpiry">12/35</span></div></div>
   </div>
 </div>
 
 <!-- Модалка истории -->
 <div id="historyModal" class="history-modal">
   <div class="history-content">
-    <div class="modal-header">
-      <h3>📋 История</h3>
-      <button class="close-modal-btn" id="closeHistoryBtn">✕</button>
-    </div>
+    <div class="modal-header"><h3>📋 История</h3><button class="close-modal-btn" id="closeHistoryBtn">✕</button></div>
     <div class="filter-bar">
       <button class="filter-btn" data-filter="today">Сегодня</button>
-      <button class="filter-btn" data-filter="week">За неделю</button>
-      <button class="filter-btn" data-filter="month">За месяц</button>
+      <button class="filter-btn" data-filter="week">За 7 дней</button>
+      <button class="filter-btn" data-filter="month">За 30 дней</button>
       <button class="filter-btn active-filter" data-filter="all">За всё время</button>
+      <button class="filter-btn calendar-filter-btn" id="openCalendarFromHistoryBtn">📅 Календарь</button>
     </div>
-    <button class="clear-btn" id="softClearBtn" style="background:#fee2e2; margin-bottom:16px;">🗑 Очистить всё</button>
+    <div class="type-filter-bar">
+      <button class="type-filter-btn active-type-filter" data-type-filter="all">💰 Все</button>
+      <button class="type-filter-btn" data-type-filter="income">📈 Доходы</button>
+      <button class="type-filter-btn" data-type-filter="expense">📉 Расходы</button>
+    </div>
     <div id="historyList" class="transactions-list"></div>
     <button class="close-history-btn" id="closeHistoryModalBtn">Закрыть</button>
   </div>
 </div>
 
-<!-- Модалка управления данными -->
+<!-- Модалка календаря -->
+<div id="calendarViewModal" class="calendar-view-modal">
+  <div class="calendar-view-content">
+    <div class="modal-header"><h3>📅 Календарь операций</h3><button class="close-modal-btn" id="closeCalendarBtn">✕</button></div>
+    <div id="calendarModalContent"></div>
+    <div style="margin-top: 12px; font-size: 11px; color: #64748b;">
+      <span style="display:inline-block; width:10px; height:10px; background:#f0fdf4; border:2px solid #22c55e; border-radius:10px; margin-right:4px;"></span> Доходы >
+      <span style="display:inline-block; width:10px; height:10px; background:#fef2f2; border:2px solid #ef4444; border-radius:10px; margin-left:10px; margin-right:4px;"></span> Расходы >
+      <span style="display:inline-block; width:10px; height:10px; background:#f8fafc; border:2px solid #cbd5e1; border-radius:10px; margin-left:10px; margin-right:4px;"></span> Без операций
+    </div>
+    <button class="close-cal-btn" id="closeCalendarModalBtn">Закрыть</button>
+  </div>
+</div>
+
+<!-- Модалка настроек - компактная -->
 <div id="settingsDataModal" class="settings-data-modal">
   <div class="settings-data-content">
-    <div class="modal-header">
-      <h3>⚙️ Управление данными</h3>
-      <button class="close-modal-btn" id="closeSettingsBtn">✕</button>
-    </div>
-    <!-- Настройка начального баланса -->
+    <div class="modal-header"><h3>⚙️ Управление данными</h3><button class="close-modal-btn" id="closeSettingsBtn">✕</button></div>
     <div class="balance-settings">
       <h4>💰 Начальный баланс</h4>
       <div class="balance-input-row">
@@ -813,12 +709,21 @@
         <button class="apply-balance-btn" id="applyBalanceBtn">Установить</button>
       </div>
     </div>
-    <div class="settings-panel" style="flex-direction:column;">
-      <button class="settings-btn" id="exportExcelBtn">📎 Excel (XLSX)</button>
-      <button class="settings-btn" id="exportBackupBtn">💾 Бэкап JSON</button>
-      <label class="import-label">📂 Восстановить<input type="file" id="importFileInput" accept=".json" class="file-input-hidden"></label>
-      <button class="settings-btn" id="editCategoriesFromSettingsBtn">✏️ Редактировать категории</button>
+    <div class="period-selector">
+      <div class="period-title">📊 Период отображения статистики</div>
+      <div class="period-buttons">
+        <button class="period-btn" data-period="day">День</button>
+        <button class="period-btn" data-period="week">Неделя</button>
+        <button class="period-btn" data-period="month">Месяц</button>
+      </div>
     </div>
+    <button class="clear-all-btn" id="clearAllBtn">🗑 Очистить всю историю</button>
+    <div class="settings-panel">
+      <button class="settings-btn" id="exportExcelBtn">📎 Excel</button>
+      <button class="settings-btn" id="exportBackupBtn">💾 Бэкап</button>
+      <label class="import-label">📂 Восстановить<input type="file" id="importFileInput" accept=".json" class="file-input-hidden"></label>
+    </div>
+    <button class="settings-btn" id="editCategoriesBtn" style="margin-top:10px;">✏️ Редактировать категории</button>
     <button class="close-settings-btn" id="closeSettingsModalBtn">Закрыть</button>
   </div>
 </div>
@@ -826,67 +731,20 @@
 <!-- Модалка операции -->
 <div id="operationModal" class="modal-overlay">
   <div class="add-form-modal" id="operationForm">
-    <div class="modal-header">
-      <h3>✨ Новая операция</h3>
-      <button class="close-modal-btn" id="closeModalBtn">✕</button>
-    </div>
-    <div class="form-row">
-      <input type="number" id="amountInput" placeholder="Сумма" inputmode="decimal" step="any">
-    </div>
-    <div class="form-row">
-      <div class="type-toggle" id="typeToggle">
-        <div class="type-btn active-income" data-type="income">💰 Доход</div>
-        <div class="type-btn" data-type="expense">💸 Расход</div>
-      </div>
-    </div>
-    <div class="form-row">
-      <button class="select-category-btn" id="openCategorySelectBtn">
-        <span id="selectedCategoryDisplay">Продукты</span>
-        <span>▼</span>
-      </button>
-    </div>
-    <div class="form-row">
-      <input type="text" id="commentInput" placeholder="Комментарий">
-    </div>
-    <div class="form-row">
-      <button class="select-category-btn" id="openDateSelectBtn">
-        <span id="selectedDateDisplay">2026-06-14</span>
-        <span>📅</span>
-      </button>
-    </div>
+    <div class="modal-header"><h3>✨ Новая операция</h3><button class="close-modal-btn" id="closeModalBtn">✕</button></div>
+    <div class="form-row"><input type="number" id="amountInput" placeholder="Сумма" inputmode="decimal" step="any"></div>
+    <div class="form-row"><div class="type-toggle" id="typeToggle"><div class="type-btn active-income" data-type="income">💰 Доход</div><div class="type-btn" data-type="expense">💸 Расход</div></div></div>
+    <div class="form-row"><button class="select-category-btn" id="openCategorySelectBtn"><span id="selectedCategoryDisplay">Продукты</span><span>▼</span></button></div>
+    <div class="form-row"><input type="text" id="commentInput" placeholder="Комментарий"></div>
+    <div class="form-row"><button class="select-category-btn" id="openDateSelectBtn"><span id="selectedDateDisplay">2026-06-14</span><span>📅</span></button></div>
     <button class="submit-btn" id="addTransactionBtn">✅ Добавить операцию</button>
   </div>
 </div>
 
-<!-- Модалка выбора категории -->
-<div id="categorySelectModal" class="category-select-modal">
-  <div class="category-select-content">
-    <h3>📂 Выберите категорию</h3>
-    <div id="categorySelectList" class="category-list"></div>
-    <button class="close-cat-btn" id="closeCategorySelectBtn">Закрыть</button>
-  </div>
-</div>
-
-<!-- Модалка выбора даты -->
-<div id="dateSelectModal" class="calendar-select-modal">
-  <div class="calendar-select-content">
-    <div id="calendarModalContent"></div>
-    <button class="close-cal-btn" id="closeDateSelectBtn">Закрыть</button>
-  </div>
-</div>
-
-<!-- Модалка категорий -->
-<div id="categoryModal" class="cat-modal">
-  <div class="cat-content">
-    <h4>✏️ Редактирование категорий</h4>
-    <div id="categoryListContainer" class="cat-list"></div>
-    <div class="add-cat-field">
-      <input type="text" id="newCategoryName" placeholder="Новая категория">
-      <button id="addCategoryBtn">+</button>
-    </div>
-    <button class="close-cat-btn" id="closeCatModalBtn">Закрыть</button>
-  </div>
-</div>
+<!-- Модалки выбора -->
+<div id="categorySelectModal" class="category-select-modal"><div class="category-select-content"><h3>📂 Выберите категорию</h3><div id="categorySelectList" class="category-list"></div><button class="close-cat-btn" id="closeCategorySelectBtn">Закрыть</button></div></div>
+<div id="dateSelectModal" class="calendar-view-modal"><div class="calendar-view-content"><div id="dateSelectCalendarContent"></div><button class="close-cal-btn" id="closeDateSelectCalendarBtn">Закрыть</button></div></div>
+<div id="categoryModal" class="cat-modal"><div class="cat-content"><h4>✏️ Редактирование категорий</h4><div id="categoryListContainer" class="cat-list"></div><div class="add-cat-field"><input type="text" id="newCategoryName" placeholder="Новая категория"><button id="addCategoryBtn">+</button></div><button class="close-cat-btn" id="closeCatModalBtn">Закрыть</button></div></div>
 
 <!-- Alert, Confirm, Prompt -->
 <div id="alertModal" class="alert-modal"><div class="alert-content"><h4 id="alertTitle">📢 Уведомление</h4><p id="alertMessage"></p><button class="confirm-cancel" id="alertCloseBtn" style="background:linear-gradient(135deg, #667eea, #764ba2);color:white;">OK</button></div></div>
@@ -897,11 +755,34 @@
   let transactions = [];
   let categories = ['Продукты', 'Транспорт', 'Бизнес', 'Жилье', 'Другое'];
   let currentFilter = 'all';
+  let currentTypeFilter = 'all';
   let selectedDate = new Date().toISOString().slice(0,10);
   let selectedCategory = 'Продукты';
   let currentCalendarYear = new Date().getFullYear();
   let currentCalendarMonth = new Date().getMonth();
-  let initialBalance = 0;  // Начальный баланс
+  let initialBalance = 0;
+  let statsPeriod = 'month';
+
+  function getDateRangeByPeriod(period) {
+    const now = new Date();
+    const today = new Date().toISOString().slice(0,10);
+    if (period === 'day') return { start: today, end: today };
+    if (period === 'week') { const weekAgo = new Date(); weekAgo.setDate(now.getDate() - 7); return { start: weekAgo.toISOString().slice(0,10), end: today }; }
+    if (period === 'month') { const monthAgo = new Date(); monthAgo.setDate(now.getDate() - 30); return { start: monthAgo.toISOString().slice(0,10), end: today }; }
+    return { start: '2000-01-01', end: today };
+  }
+
+  function getPeriodStats() {
+    const range = getDateRangeByPeriod(statsPeriod);
+    let income = 0, expense = 0;
+    for (let tx of transactions) {
+      if (tx.date >= range.start && tx.date <= range.end) {
+        if (tx.type === 'income') income += tx.amount;
+        else expense += tx.amount;
+      }
+    }
+    return { income, expense };
+  }
 
   function getDailyStats() {
     const dailyStats = {};
@@ -923,23 +804,7 @@
     return balance;
   }
 
-  function computeStats() {
-    let monthIncome = 0, monthExpense = 0;
-    const now = new Date(), curYear = now.getFullYear(), curMonth = now.getMonth();
-    for (let tx of transactions) {
-      const d = new Date(tx.date);
-      if (d.getFullYear() === curYear && d.getMonth() === curMonth) {
-        if (tx.type === 'income') monthIncome += tx.amount;
-        else monthExpense += tx.amount;
-      }
-    }
-    return { monthIncome, monthExpense };
-  }
-
-  function saveToLocal() { 
-    localStorage.setItem('expenses_app', JSON.stringify({ transactions, categories, initialBalance })); 
-  }
-  
+  function saveToLocal() { localStorage.setItem('expenses_app', JSON.stringify({ transactions, categories, initialBalance, statsPeriod })); }
   function loadFromLocal() {
     const raw = localStorage.getItem('expenses_app');
     if (raw) { 
@@ -948,42 +813,56 @@
         if (data.transactions) transactions = data.transactions; 
         if (data.categories) categories = data.categories;
         if (data.initialBalance !== undefined) initialBalance = data.initialBalance;
+        if (data.statsPeriod) statsPeriod = data.statsPeriod;
       } catch(e) {} 
     }
     if (!categories.length) categories = ['Продукты', 'Транспорт', 'Бизнес', 'Жилье', 'Другое'];
     document.getElementById('initialBalanceInput').value = initialBalance;
   }
 
-  function formatUAH(num) { 
-    return Number(num).toLocaleString('ru-UA', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' ₴'; 
+  function formatUAH(num) { return Number(num).toLocaleString('ru-UA', { min: 0, max: 2 }) + ' ₴'; }
+  
+  function updateStatsLabels() {
+    const periodNames = { day: 'ДЕНЬ', week: 'НЕДЕЛЯ', month: 'МЕСЯЦ' };
+    document.getElementById('statsLabelIncome').innerHTML = `ДОХОДЫ (${periodNames[statsPeriod]})`;
+    document.getElementById('statsLabelExpense').innerHTML = `РАСХОДЫ (${periodNames[statsPeriod]})`;
   }
   
   function updateStats() {
     const balance = computeBalance();
-    const { monthIncome, monthExpense } = computeStats();
+    const { income, expense } = getPeriodStats();
     document.getElementById('balanceTotal').innerText = formatUAH(balance);
-    document.getElementById('monthIncome').innerText = formatUAH(monthIncome);
-    document.getElementById('monthExpense').innerText = formatUAH(monthExpense);
+    document.getElementById('periodIncome').innerText = formatUAH(income);
+    document.getElementById('periodExpense').innerText = formatUAH(expense);
   }
 
-  function setInitialBalance() {
-    const val = parseFloat(document.getElementById('initialBalanceInput').value);
-    if (!isNaN(val)) {
-      initialBalance = val;
-      saveToLocal();
-      updateStats();
-      showAlert(`Начальный баланс установлен на ${formatUAH(initialBalance)}`, '✅ Готово');
-    } else {
-      showAlert('Введите корректную сумму', 'Ошибка');
-    }
+  function setStatsPeriod(period) {
+    statsPeriod = period;
+    saveToLocal();
+    updateStatsLabels();
+    updateStats();
+    document.querySelectorAll('.period-btn').forEach(btn => {
+      btn.classList.remove('active-period');
+      if (btn.dataset.period === period) btn.classList.add('active-period');
+    });
   }
 
   function filterByPeriod(period) {
-    const now = new Date(), today = new Date().toISOString().slice(0,10);
+    const now = new Date();
+    const today = new Date().toISOString().slice(0,10);
     if (period === 'today') return transactions.filter(t => t.date === today);
     if (period === 'week') { const weekAgo = new Date(); weekAgo.setDate(now.getDate() - 7); return transactions.filter(t => new Date(t.date) >= weekAgo); }
-    if (period === 'month') { const monthAgo = new Date(); monthAgo.setMonth(now.getMonth() - 1); return transactions.filter(t => new Date(t.date) >= monthAgo); }
+    if (period === 'month') { const monthAgo = new Date(); monthAgo.setDate(now.getDate() - 30); return transactions.filter(t => new Date(t.date) >= monthAgo); }
     return [...transactions];
+  }
+
+  function filterByType(transactionsArray) {
+    if (currentTypeFilter === 'all') return transactionsArray;
+    return transactionsArray.filter(t => t.type === currentTypeFilter);
+  }
+
+  function filterByDate(transactionsArray, date) {
+    return transactionsArray.filter(t => t.date === date);
   }
 
   function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
@@ -1001,8 +880,14 @@
     showAlert('Запись удалена', '✅ Готово');
   }
 
-  function renderHistory() {
-    const filtered = filterByPeriod(currentFilter);
+  function renderHistory(selectedDateFilter = null) {
+    let filtered;
+    if (selectedDateFilter) {
+      filtered = filterByDate(transactions, selectedDateFilter);
+    } else {
+      filtered = filterByPeriod(currentFilter);
+    }
+    filtered = filterByType(filtered);
     const container = document.getElementById('historyList');
     if (!filtered.length) { container.innerHTML = '<div class="empty-history">📭 Нет операций</div>'; return; }
     const sorted = [...filtered].sort((a,b) => new Date(b.date) - new Date(a.date));
@@ -1014,10 +899,9 @@
       for (let tx of txs) {
         const sign = tx.type === 'income' ? '+' : '−';
         const amountClass = tx.type === 'income' ? 'income-amount' : 'expense-amount';
-        const badgeClass = tx.type === 'income' ? 'income-badge' : 'expense-badge';
-        const badgeText = tx.type === 'income' ? 'Доход' : 'Расход';
-        html += `<div class="transaction-item">
-          <div class="tx-left"><div class="tx-category"><span>${escapeHtml(tx.category)}</span><span class="tx-badge ${badgeClass}">${badgeText}</span></div>${tx.comment ? `<div class="tx-comment">📝 ${escapeHtml(tx.comment)}</div>` : ''}<div class="tx-comment">${tx.date}</div></div>
+        const borderClass = tx.type === 'income' ? 'income-border' : 'expense-border';
+        html += `<div class="transaction-item ${borderClass}">
+          <div class="tx-left"><div class="tx-category">${escapeHtml(tx.category)}</div>${tx.comment ? `<div class="tx-comment">📝 ${escapeHtml(tx.comment)}</div>` : ''}<div class="tx-date">${tx.date}</div></div>
           <div class="tx-amount ${amountClass}">${sign} ${formatUAH(tx.amount)}</div>
           <button class="delete-btn" data-id="${tx.id}">✕</button>
         </div>`;
@@ -1026,57 +910,60 @@
     }
     container.innerHTML = html;
     document.querySelectorAll('#historyList .delete-btn').forEach(btn => {
-      btn.addEventListener('click', () => { const id = btn.getAttribute('data-id'); showConfirm('Удалить эту операцию?', () => deleteTransaction(id)); });
+      btn.addEventListener('click', () => { const id = btn.getAttribute('data-id'); showConfirm('Удалить операцию?', () => deleteTransaction(id)); });
     });
   }
 
-  function renderCalendarModal(year, month) {
+  function renderCalendarModal(containerId, year, month, onDateSelect) {
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month+1, 0).getDate();
     const startOffset = firstDay === 0 ? 6 : firstDay - 1;
     const dailyStats = getDailyStats();
     const todayStr = new Date().toISOString().slice(0,10);
-    
     let html = `<div class="calendar-header"><button id="calPrevBtn">◀</button><span>${new Date(year, month).toLocaleDateString('ru', { month:'long', year:'numeric' })}</span><button id="calNextBtn">▶</button></div>`;
     html += `<div class="calendar-weekdays">${['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(d => `<div>${d}</div>`).join('')}</div><div class="calendar-days">`;
     for (let i=0; i<startOffset; i++) html += `<div></div>`;
     for (let d=1; d<=daysInMonth; d++) {
       const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      const isSelected = dateStr === selectedDate;
       const isToday = dateStr === todayStr;
       const stats = dailyStats[dateStr];
       const hasTransactions = stats && (stats.income > 0 || stats.expense > 0);
-      let additionalClass = '';
-      let dominantClass = '';
+      let additionalClass = '', dominantClass = '';
       if (hasTransactions) {
         additionalClass = 'has-transactions';
         if (stats.income > stats.expense) dominantClass = 'income-dominant';
         else if (stats.expense > stats.income) dominantClass = 'expense-dominant';
       }
-      html += `<div class="cal-day ${isSelected ? 'selected' : ''} ${additionalClass} ${dominantClass} ${isToday ? 'today' : ''}" data-date="${dateStr}">${d}</div>`;
+      html += `<div class="cal-day ${additionalClass} ${dominantClass} ${isToday ? 'today' : ''}" data-date="${dateStr}">${d}</div>`;
     }
     html += `</div>`;
-    document.getElementById('calendarModalContent').innerHTML = html;
-    
-    document.querySelectorAll('#calendarModalContent .cal-day[data-date]').forEach(el => {
+    document.getElementById(containerId).innerHTML = html;
+    document.querySelectorAll(`#${containerId} .cal-day[data-date]`).forEach(el => {
       el.addEventListener('click', () => {
-        selectedDate = el.getAttribute('data-date');
-        document.getElementById('selectedDateDisplay').innerText = selectedDate;
-        document.getElementById('dateSelectModal').classList.remove('active');
+        const date = el.getAttribute('data-date');
+        if (onDateSelect) onDateSelect(date);
       });
     });
     document.getElementById('calPrevBtn')?.addEventListener('click', () => {
       let nm = month-1, ny = year;
       if (nm < 0) { nm = 11; ny--; }
-      currentCalendarYear = ny; currentCalendarMonth = nm;
-      renderCalendarModal(ny, nm);
+      renderCalendarModal(containerId, ny, nm, onDateSelect);
     });
     document.getElementById('calNextBtn')?.addEventListener('click', () => {
       let nm = month+1, ny = year;
       if (nm > 11) { nm = 0; ny++; }
-      currentCalendarYear = ny; currentCalendarMonth = nm;
-      renderCalendarModal(ny, nm);
+      renderCalendarModal(containerId, ny, nm, onDateSelect);
     });
+  }
+
+  function openCalendarForHistory() {
+    const modal = document.getElementById('calendarViewModal');
+    renderCalendarModal('calendarModalContent', currentCalendarYear, currentCalendarMonth, (date) => {
+      modal.classList.remove('active');
+      renderHistory(date);
+      showAlert(`Показаны операции за ${date}`, '📅 Календарь');
+    });
+    modal.classList.add('active');
   }
 
   function renderCategorySelectList() {
@@ -1086,11 +973,7 @@
       const div = document.createElement('div');
       div.className = 'category-option' + (selectedCategory === cat ? ' selected' : '');
       div.textContent = cat;
-      div.addEventListener('click', () => {
-        selectedCategory = cat;
-        document.getElementById('selectedCategoryDisplay').innerText = cat;
-        document.getElementById('categorySelectModal').classList.remove('active');
-      });
+      div.addEventListener('click', () => { selectedCategory = cat; document.getElementById('selectedCategoryDisplay').innerText = cat; document.getElementById('categorySelectModal').classList.remove('active'); });
       container.appendChild(div);
     });
   }
@@ -1167,7 +1050,7 @@
     showAlert('Excel скачан');
   }
   function exportBackup() {
-    const blob = new Blob([JSON.stringify({ transactions, categories, initialBalance }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ transactions, categories, initialBalance, statsPeriod }, null, 2)], { type: 'application/json' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_${new Date().toISOString().slice(0,19)}.json`; a.click();
     showAlert('Бэкап создан');
   }
@@ -1179,22 +1062,24 @@
         if (data.transactions) transactions = data.transactions.map(t => ({ ...t, id: Date.now() + Math.random() }));
         if (data.categories) categories = data.categories;
         if (data.initialBalance !== undefined) initialBalance = data.initialBalance;
+        if (data.statsPeriod) statsPeriod = data.statsPeriod;
         if (!categories.includes(selectedCategory)) selectedCategory = categories[0];
         document.getElementById('selectedCategoryDisplay').innerText = selectedCategory;
         document.getElementById('initialBalanceInput').value = initialBalance;
+        document.querySelectorAll('.period-btn').forEach(btn => {
+          btn.classList.remove('active-period');
+          if (btn.dataset.period === statsPeriod) btn.classList.add('active-period');
+        });
+        updateStatsLabels();
         saveToLocal(); updateStats(); renderHistory(); renderCategorySelectList();
         showAlert(`Восстановлено ${transactions.length} записей`);
       } catch { showAlert('Ошибка файла'); }
     };
     reader.readAsText(file);
   }
-  function clearAll() { showConfirm('Удалить ВСЕ операции?', () => { transactions = []; saveToLocal(); updateStats(); renderHistory(); showAlert('Все удалено'); }); }
-  function setFilter(f) { 
-    currentFilter = f; 
-    document.querySelectorAll('#historyModal .filter-btn').forEach(btn => btn.classList.remove('active-filter')); 
-    document.querySelector(`#historyModal .filter-btn[data-filter="${f}"]`).classList.add('active-filter'); 
-    renderHistory(); 
-  }
+  function clearAll() { showConfirm('Удалить ВСЕ операции?', () => { transactions = []; saveToLocal(); updateStats(); renderHistory(); showAlert('Все операции удалены'); }); }
+  function setFilter(f) { currentFilter = f; document.querySelectorAll('#historyModal .filter-btn:not(#openCalendarFromHistoryBtn)').forEach(btn => btn.classList.remove('active-filter')); document.querySelector(`#historyModal .filter-btn[data-filter="${f}"]`).classList.add('active-filter'); renderHistory(); }
+  function setTypeFilter(f) { currentTypeFilter = f; document.querySelectorAll('#historyModal .type-filter-btn').forEach(btn => btn.classList.remove('active-type-filter')); document.querySelector(`#historyModal .type-filter-btn[data-type-filter="${f}"]`).classList.add('active-type-filter'); renderHistory(); }
   function updateFormBg() {
     const form = document.getElementById('operationForm');
     const active = document.querySelector('#typeToggle .type-btn.active-income, #typeToggle .type-btn.active-expense');
@@ -1203,35 +1088,25 @@
     else if (active?.dataset.type === 'expense') form.classList.add('expense-bg');
   }
 
-  function showAlert(msg, title = 'Уведомление') {
-    const modal = document.getElementById('alertModal');
-    document.getElementById('alertTitle').innerText = title;
-    document.getElementById('alertMessage').innerText = msg;
-    modal.classList.add('active');
-    document.getElementById('alertCloseBtn').onclick = () => modal.classList.remove('active');
-  }
-
+  function showAlert(msg, title = 'Уведомление') { const modal = document.getElementById('alertModal'); document.getElementById('alertTitle').innerText = title; document.getElementById('alertMessage').innerText = msg; modal.classList.add('active'); document.getElementById('alertCloseBtn').onclick = () => modal.classList.remove('active'); }
   function showConfirm(msg, onYes) {
     const modal = document.getElementById('confirmModal');
     document.getElementById('confirmMessage').innerText = msg;
     modal.classList.add('active');
-    const yesBtn = document.getElementById('confirmYesBtn');
-    const noBtn = document.getElementById('confirmNoBtn');
+    const yesBtn = document.getElementById('confirmYesBtn'), noBtn = document.getElementById('confirmNoBtn');
     const cleanup = () => { yesBtn.removeEventListener('click', onYesClick); noBtn.removeEventListener('click', onNoClick); };
     const onYesClick = () => { modal.classList.remove('active'); cleanup(); if (onYes) onYes(); };
     const onNoClick = () => { modal.classList.remove('active'); cleanup(); };
     yesBtn.addEventListener('click', onYesClick);
     noBtn.addEventListener('click', onNoClick);
   }
-
   function showPrompt(currentVal, callback) {
     const modal = document.getElementById('promptModal');
     const input = document.getElementById('promptInput');
     input.value = currentVal;
     modal.classList.add('active');
     input.focus();
-    const okBtn = document.getElementById('promptOkBtn');
-    const cancelBtn = document.getElementById('promptCancelBtn');
+    const okBtn = document.getElementById('promptOkBtn'), cancelBtn = document.getElementById('promptCancelBtn');
     const onOk = () => { const newVal = input.value.trim(); modal.classList.remove('active'); cleanup(); if (newVal && newVal !== currentVal) callback(newVal); };
     const onCancel = () => { modal.classList.remove('active'); cleanup(); };
     const cleanup = () => { okBtn.removeEventListener('click', onOk); cancelBtn.removeEventListener('click', onCancel); };
@@ -1244,33 +1119,59 @@
     selectedCategory = categories[0];
     document.getElementById('selectedCategoryDisplay').innerText = selectedCategory;
     document.getElementById('selectedDateDisplay').innerText = selectedDate;
-    updateStats(); renderHistory(); renderCategorySelectList();
+    
+    document.querySelectorAll('.period-btn').forEach(btn => {
+      btn.classList.remove('active-period');
+      if (btn.dataset.period === statsPeriod) btn.classList.add('active-period');
+    });
+    
+    updateStatsLabels();
+    updateStats(); 
+    renderHistory(); 
+    renderCategorySelectList();
     
     document.getElementById('openNewOperationBtn').onclick = () => document.getElementById('operationModal').classList.add('active');
     document.getElementById('openHistoryBtn').onclick = () => { renderHistory(); document.getElementById('historyModal').classList.add('active'); };
     document.getElementById('openSettingsBtn').onclick = () => document.getElementById('settingsDataModal').classList.add('active');
-    document.getElementById('applyBalanceBtn').onclick = setInitialBalance;
-    
+    document.getElementById('applyBalanceBtn').onclick = () => {
+      const val = parseFloat(document.getElementById('initialBalanceInput').value);
+      if (!isNaN(val)) { initialBalance = val; saveToLocal(); updateStats(); showAlert(`Начальный баланс: ${formatUAH(initialBalance)}`, '✅ Готово'); }
+      else showAlert('Введите корректную сумму', 'Ошибка');
+    };
+    document.getElementById('clearAllBtn').onclick = clearAll;
     document.getElementById('closeModalBtn').onclick = () => document.getElementById('operationModal').classList.remove('active');
     document.getElementById('closeHistoryBtn').onclick = () => document.getElementById('historyModal').classList.remove('active');
     document.getElementById('closeHistoryModalBtn').onclick = () => document.getElementById('historyModal').classList.remove('active');
     document.getElementById('closeSettingsBtn').onclick = () => document.getElementById('settingsDataModal').classList.remove('active');
     document.getElementById('closeSettingsModalBtn').onclick = () => document.getElementById('settingsDataModal').classList.remove('active');
-    
     document.getElementById('openCategorySelectBtn').onclick = () => { renderCategorySelectList(); document.getElementById('categorySelectModal').classList.add('active'); };
     document.getElementById('closeCategorySelectBtn').onclick = () => document.getElementById('categorySelectModal').classList.remove('active');
-    document.getElementById('openDateSelectBtn').onclick = () => { currentCalendarYear = new Date().getFullYear(); currentCalendarMonth = new Date().getMonth(); renderCalendarModal(currentCalendarYear, currentCalendarMonth); document.getElementById('dateSelectModal').classList.add('active'); };
-    document.getElementById('closeDateSelectBtn').onclick = () => document.getElementById('dateSelectModal').classList.remove('active');
+    document.getElementById('openDateSelectBtn').onclick = () => {
+      renderCalendarModal('dateSelectCalendarContent', new Date().getFullYear(), new Date().getMonth(), (date) => {
+        selectedDate = date;
+        document.getElementById('selectedDateDisplay').innerText = selectedDate;
+        document.getElementById('dateSelectModal').classList.remove('active');
+      });
+      document.getElementById('dateSelectModal').classList.add('active');
+    };
+    document.getElementById('closeDateSelectCalendarBtn').onclick = () => document.getElementById('dateSelectModal').classList.remove('active');
     document.getElementById('addTransactionBtn').onclick = addTransaction;
     document.getElementById('exportExcelBtn').onclick = exportToExcel;
     document.getElementById('exportBackupBtn').onclick = exportBackup;
-    document.getElementById('softClearBtn').onclick = clearAll;
-    document.getElementById('editCategoriesFromSettingsBtn').onclick = () => { document.getElementById('settingsDataModal').classList.remove('active'); openCategoryModal(); };
+    document.getElementById('editCategoriesBtn').onclick = () => { document.getElementById('settingsDataModal').classList.remove('active'); openCategoryModal(); };
     document.getElementById('importFileInput').onchange = e => { if (e.target.files[0]) importBackup(e.target.files[0]); e.target.value = ''; };
     document.getElementById('closeCatModalBtn').onclick = () => document.getElementById('categoryModal').classList.remove('active');
     document.getElementById('addCategoryBtn').onclick = addNewCategory;
+    document.getElementById('openCalendarFromHistoryBtn').onclick = () => openCalendarForHistory();
+    document.getElementById('closeCalendarBtn').onclick = () => document.getElementById('calendarViewModal').classList.remove('active');
+    document.getElementById('closeCalendarModalBtn').onclick = () => document.getElementById('calendarViewModal').classList.remove('active');
     
-    document.querySelectorAll('#historyModal .filter-btn').forEach(btn => btn.onclick = () => setFilter(btn.dataset.filter));
+    document.querySelectorAll('.period-btn').forEach(btn => {
+      btn.addEventListener('click', () => setStatsPeriod(btn.dataset.period));
+    });
+    
+    document.querySelectorAll('#historyModal .filter-btn:not(#openCalendarFromHistoryBtn)').forEach(btn => btn.onclick = () => setFilter(btn.dataset.filter));
+    document.querySelectorAll('#historyModal .type-filter-btn').forEach(btn => btn.onclick = () => setTypeFilter(btn.dataset.typeFilter));
     
     document.querySelectorAll('#typeToggle .type-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1285,8 +1186,10 @@
     document.getElementById('historyModal').addEventListener('click', (e) => { if (e.target === document.getElementById('historyModal')) document.getElementById('historyModal').classList.remove('active'); });
     document.getElementById('settingsDataModal').addEventListener('click', (e) => { if (e.target === document.getElementById('settingsDataModal')) document.getElementById('settingsDataModal').classList.remove('active'); });
     document.getElementById('categorySelectModal').addEventListener('click', (e) => { if (e.target === document.getElementById('categorySelectModal')) document.getElementById('categorySelectModal').classList.remove('active'); });
+    document.getElementById('calendarViewModal').addEventListener('click', (e) => { if (e.target === document.getElementById('calendarViewModal')) document.getElementById('calendarViewModal').classList.remove('active'); });
     document.getElementById('dateSelectModal').addEventListener('click', (e) => { if (e.target === document.getElementById('dateSelectModal')) document.getElementById('dateSelectModal').classList.remove('active'); });
   }
+  
   init();
 </script>
 </body>
